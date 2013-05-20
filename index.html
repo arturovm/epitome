@@ -1,0 +1,77 @@
+<!Doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Pond</title>
+
+		<link rel="stylesheet" href="css/base.css">
+		<link rel="stylesheet" href="css/skeleton.css">
+		<link rel="stylesheet" href="css/layout.css">
+
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+	<body>
+		<div class="container">
+			<img class="two columns offset-by-seven" id="logo" src="img/pond_logo.png">
+			<ul class="sixteen columns" id="nav">
+				<li><a href="#qa">Q&A</a></li>
+				<li><a>Download</a></li>
+				<li><a>Installation</a></li>
+				<li><a>API Documentation</a></li>
+				<li><a>Contact</a></li>
+			</ul>
+			<hr/>
+			<div class="row">
+				<div class="two-thirds column">
+					<h2>Introducing Pond</h2>
+					<p>A self–hosted RSS+Atom feed synchronization solution with emphasis on simplicity, elegance, and ease of use for developers and users alike.</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="one-third column">
+					<h3>Simple & Minimal</h3>
+					<p>No complicated sorting algorithms. No useless social bells and whistles.</p>
+					<p>Pond focuses on doing one thing well: synchronizing your feeds across devices and apps.</p>
+					<p>Extra care is taken to give it a very small footprint.</p>
+				</div>
+				<div class="one-third column">
+					<h3>Elegant</h3>
+					<p>Code, that is.</p>
+					<p>Kidding. Actually, the API is RESTful, and was specifically designed for ease of integration.</p>
+					<p>No nonsense.</p>
+				</div>
+				<div class="one-third column">
+					<h3>Self–hosted</h3>
+					<p>Never rely on giant corporations to give you a continous service again.</p>
+					<p>Never trust them with your data.</p>
+				</div>
+			</div>
+			<div class="row">
+				<h3 style="text-align: center">And it's all open source.</h3>
+			</div>
+			<div class="row">
+				<div class="two-thirds column">
+					<h2>Designed with a decentralized philosophy in mind</h2>
+					</p><p>
+				</div>
+			</div>
+			<hr/>
+			<div id="qa" class="twelve columns offset-by-two">
+				<h2 style="text-align: center">Q&A</h2>
+				<h3>What?</h3>
+				<p>Pond is a simple, elegant, self–hosted RSS+Atom feed sync solution.</p>
+				<h3>Why?</h2>
+				<p>With the recent announcement of the death of Google Reader, many alternatives have been popping up, but—to the extent of my knowledge—none of them is self–hosted <em>and</em> open source.</p>
+				<h3>How?</h2>
+				<p>Pond is written in Go and uses SQLite for storage.</p>
+				<h3>Can I install Pond on my commodity server?</h3>
+				<p>No. Currently, because of the technology stack, it can only be deployed to VPSes, but if enough people request it, and the project gets enough collaborators, a PHP port might get written.</p>
+				<h3>I installed Pond—now how do I read my feeds?</h3>
+				<p>Pond, on its own, is pretty much useless for that purpose. It is intended to provide the necessary infrastructure to sync your feeds across readers and devices.</p>
+				<p>To read your feeds, you'll need a reader that supports Pond. If you are a developer, I encourage you to read the API documentation, and consider integrating Pond into your reader.</p>
+				<p>In the future, a front–end app to read your feeds might get built. No promises, though.</p>
+			</div>
+		</div>
+		<script async src="http://use.edgefonts.net/source-sans-pro;droid-serif;merriweather;droid-sans.js"></script>
+	</body>
+</html>
