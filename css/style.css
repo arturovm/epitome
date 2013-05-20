@@ -1,0 +1,48 @@
+body {
+	color: #0e0e0e;
+	background-color: #fcfcfc;
+	font-family: merriweather, serif;
+	font-size: 62.5%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: source-sans-pro, sans-serif;
+}
+
+p {
+	font-size: 0.9rem;
+}
+
+#logo {
+	margin-top: 1rem;
+	text-align: center;
+}
+
+#nav {
+	text-align: center;
+	margin-top: 2rem;
+	font-family: source-sans-pro, sans-serif;
+	font-size: 1rem;
+}
+
+#nav li {
+	display: inline-block;
+	margin-left: 0.3rem;
+}
+ #nav li:first-child {
+	 margin-left: 0;
+}
+
+#nav li a {
+	text-decoration: none;
+	color: #0e0e0e;
+}
+
+#nav li a:hover {
+	text-decoration: underline;
+	color: #0e0e0e;
+}
+
+#qa h3 {
+	margin-top: 2rem;
+}
