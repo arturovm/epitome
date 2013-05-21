@@ -17,3 +17,4 @@ func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 }
 
 func DeleteSubscription(w http.ResponseWriter, req *http.Request) {
+}
