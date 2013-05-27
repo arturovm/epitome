@@ -1,8 +1,8 @@
 package main
 
 import (
-	"net/http"
 	"github.com/bmizerany/pat"
+	"net/http"
 )
 
 func RegisterRoutes() *pat.PatternServeMux {
@@ -17,9 +17,10 @@ func RegisterRoutes() *pat.PatternServeMux {
 	* Regarding GET /subscriptions:
 	* Should this list the user's subscriptions? Or return all his articles (with proper filters and such)?
 	* The RESTful thing to do seems to be the first option. But then, what endpoint should return all of the user's articles?
-	*/
+	 */
 	m.Del("/api/subscriptions/:id", http.HandlerFunc(DeleteSubscription))
 	// Articles
+	m.Get("/api/subscriptions/articles", http.HandlerFunc(GetAllArticles))
 	m.Get("/api/subscriptions/:id", http.HandlerFunc(GetArticles))
 	m.Put("/api/subscriptions/:subid/:artid", http.HandlerFunc(PutArticle))
 	// Favorites
