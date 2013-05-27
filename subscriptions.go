@@ -3,11 +3,10 @@ package main
 import (
 	"errors"
 	"github.com/moovweb/gokogiri"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-	"io/ioutil"
-	//"strconv"
 )
 
 type Subscription struct {
