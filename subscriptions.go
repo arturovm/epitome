@@ -1,7 +1,9 @@
 package main
 
 import (
+	"database/sql"
 	"errors"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/moovweb/gokogiri"
 	"io/ioutil"
 	"log"
@@ -64,7 +66,9 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			log.Fatalf("RSS URL: %s", rssUrl)
+			DB, _ := sql.Open("sqlite3", "db.db")
+			DB.Exec("insert into subscriptions values (null, ?, null)", rssUrl)
+			DB.Close()
 		}
 	}
 }

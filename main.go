@@ -14,7 +14,7 @@ func main() {
 			log.Fatal(err)
 		}
 		DB, _ := sql.Open("sqlite3", "db.db")
-		DB.Exec("create table subscriptions (id int auto_increment pimary key, url string, name string)")
+		DB.Exec("create table subscriptions (id integer primary key, url text, name text)")
 		if err := DB.Close(); err != nil {
 			log.Fatal(err)
 		}
