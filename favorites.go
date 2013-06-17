@@ -5,12 +5,12 @@ import (
 )
 
 type Favorite struct {
-	Id string
-	Url string
-	Name string
-	Author string
+	Id        string
+	Url       string
+	Name      string
+	Author    string
 	Published int
-	Body string
+	Body      string
 }
 
 func PostFavorites(w http.ResponseWriter, req *http.Request) {

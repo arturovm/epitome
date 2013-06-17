@@ -5,14 +5,14 @@ import (
 )
 
 type Article struct {
-	Id     string
-	Url    string
-	Name   string
-	Author string
+	Id        string
+	Url       string
+	Name      string
+	Author    string
 	Published int
-	Parent *Subscription
-	Body string
-	Read bool
+	Parent    *Subscription
+	Body      string
+	Read      bool
 }
 
 func GetAllArticles(w http.ResponseWriter, req *http.Request) {
