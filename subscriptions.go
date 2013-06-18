@@ -36,7 +36,7 @@ func findRSSURL(rawurl string) (string, error) {
 	}
 	doc, err := gokogiri.ParseXml(body)
 	defer doc.Free()
-	if doc.Root().Name() != "rss" || err != nil {
+	if (doc.Root().Name() != "rss" && doc.Root().Name() != "feed") || err != nil {
 		doc, _ := gokogiri.ParseHtml(body)
 		defer doc.Free()
 		doc.RecursivelyRemoveNamespaces()
