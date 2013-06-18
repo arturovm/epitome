@@ -100,10 +100,17 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 				log.Printf("POST Subscription error (Find title error): %s", err.Error())
 			}
 			DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
-			DB.Exec("insert into subscriptions values (null, ?, ?)", rssUrl, title)
-			DB.Close()
-			w.WriteHeader(http.StatusCreated)
-			w.Write([]byte(""))
+			defer DB.Close()
+			var sub Subscription
+			rowErr := DB.QueryRow("select * from subscriptions where url=?", rssUrl).Scan(&sub.Id, &sub.Url, &sub.Name)
+			if rowErr == sql.ErrNoRows {
+				DB.Exec("insert into subscriptions values (null, ?, ?)", rssUrl, title)
+				w.WriteHeader(http.StatusCreated)
+				w.Write([]byte(""))
+			} else {
+				w.WriteHeader(http.StatusConflict)
+				w.Write([]byte(""))
+			}
 		}
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
