@@ -90,16 +90,16 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			// TODO: Write error func. How should the program decide what status code to send?
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
+			w.Write([]byte(""))
 			log.Printf("POST Subscription error (Find URL error): %s", err.Error())
 		} else {
 			title, err := findRSSTitle(rssUrl)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(err.Error()))
+				w.Write([]byte(""))
 				log.Printf("POST Subscription error (Find title error): %s", err.Error())
 			}
-			DB, _ := sql.Open("sqlite3", "db.db")
+			DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
 			DB.Exec("insert into subscriptions values (null, ?, ?)", rssUrl, title)
 			DB.Close()
 			w.WriteHeader(http.StatusCreated)
@@ -113,12 +113,12 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 
 func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 	// TODO: Auth
-	DB, _ := sql.Open("sqlite3", "db.db")
+	DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
 	rows, err := DB.Query("select * from subscriptions")
 	DB.Close()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		w.Write([]byte(""))
 		log.Printf("GET Subscriptions error (Database error): %s", err.Error())
 	}
 	subs := make([]Subscription, 0)
@@ -142,7 +142,7 @@ func DeleteSubscription(w http.ResponseWriter, req *http.Request) {
 	// TODO: Auth
 	id := req.URL.Query().Get(":id")
 	var sub Subscription
-	DB, _ := sql.Open("sqlite3", "db.db")
+	DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
 	defer DB.Close()
 	err := DB.QueryRow("select * from subscriptions where id=?", id).Scan(&sub.Id, &sub.Url, &sub.Name)
 	switch {
@@ -151,7 +151,7 @@ func DeleteSubscription(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte("Subscription does not exist"))
 	case err != nil:
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		w.Write([]byte(""))
 		log.Printf("DELETE subscription error (Database error): %s", err.Error())
 	default:
 		DB.Exec("delete from subscriptions where id=?", id)
