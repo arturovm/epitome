@@ -38,6 +38,7 @@ func findRSSURL(rawurl string) (string, error) {
 	if doc.Root().Name() != "rss" || err != nil {
 		doc, _ := gokogiri.ParseHtml(body)
 		defer doc.Free()
+		doc.RecursivelyRemoveNamespaces()
 		nodes, err := doc.Search("//link")
 		if err != nil {
 			return "", err
@@ -59,15 +60,44 @@ func findRSSURL(rawurl string) (string, error) {
 	return "", errors.New("URL not found")
 }
 
+func findRSSTitle(rssUrl string) (string, error) {
+	res, err := http.Get(rssUrl)
+	if err != nil {
+		return "", err
+	}
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
+	doc, err := gokogiri.ParseXml(body)
+	defer doc.Free()
+	doc.RecursivelyRemoveNamespaces()
+	nodes, err := doc.Search("//title")
+	if err != nil {
+		return "", err
+	}
+	if len(nodes) > 0 {
+		return nodes[0].Content(), nil
+	}
+	return "", nil
+}
+
 func PostSubscription(w http.ResponseWriter, req *http.Request) {
 	// Auth should go here, but well...
 	if rawurl := req.FormValue("url"); rawurl != "" {
 		rssUrl, err := findRSSURL(rawurl)
 		if err != nil {
+			// TODO: return error here
 			log.Fatal(err)
 		} else {
+			log.Print(rssUrl)
+			title, err := findRSSTitle(rssUrl)
+			if err != nil {
+				// TODO: return error here
+				log.Fatal(err)
+			}
 			DB, _ := sql.Open("sqlite3", "db.db")
-			DB.Exec("insert into subscriptions values (null, ?, null)", rssUrl)
+			DB.Exec("insert into subscriptions values (null, ?, ?)", rssUrl, title)
 			DB.Close()
 		}
 	}
