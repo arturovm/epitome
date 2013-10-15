@@ -1,0 +1,90 @@
+html {
+	font-size: 62.5%;
+}
+
+body {
+	color: #0e0e0e;
+	background-color: #fcfcfc;
+	font-family: merriweather, serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: source-sans-pro, sans-serif;
+}
+
+p {
+	font-size: 0.9rem;
+}
+
+.container {
+	margin-top: 2rem;
+}
+
+#logo {
+	margin-top: 1rem;
+	text-align: center;
+}
+
+#nav {
+	text-align: center;
+	/*margin-top: 2rem;*/
+	font-family: source-sans-pro, sans-serif;
+}
+
+#nav li a {
+	/*text-decoration: none;*/
+	color: #0e0e0e;
+}
+
+#nav li a:hover {
+	/*text-decoration: underline;*/
+	color: #0e0e0e;
+}
+
+.sub-name {
+	width: 80%;
+	float: left;
+	text-align: left;
+}
+
+.sub-delete-button {
+	width: 20%;
+	float: left;
+	text-align: center;
+}
+
+.sub-delete-button a {
+	max-width: 100%;
+	padding: 1rem;
+}
+
+.sub-form {
+	text-align: center;
+	vertical-align: middle;
+	display: inline;
+}
+
+.pure-button-success,
+.pure-button-error,
+.pure-button-warning,
+.pure-button-secondary {
+	color: white;
+	border-radius: 4px;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.pure-button-success {
+	background: rgb(28, 184, 65); /* this is a green */
+}
+
+.pure-button-error {
+	background: rgb(202, 60, 60); /* this is a maroon */
+}
+
+.pure-button-warning {
+	background: rgb(223, 117, 20); /* this is an orange */
+}
+
+.pure-button-secondary {
+	background: rgb(66, 184, 221); /* this is a light blue */
+}

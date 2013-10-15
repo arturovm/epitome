@@ -1,0 +1,20 @@
+<div class="row">
+<form ng-submit="submit()" id="sub-form" class="pure-form">
+		<div class="one column alpha">
+			<label for="sub-url">URL:</label>
+		</div>
+		<div class="nine columns">
+			<input  id="sub-url" class="pure-input-1" type="url" ng-model="url">
+		</div>
+		<div class="one columns omega">
+			<a type="submit" class="pure-button pure-button-primary" ng-click="submit()">Add</a>
+		</div>
+</form>
+</div>
+<hr>
+<div id="sub-list">
+	<div ng-repeat="sub in subs" class="row">
+			<div class="sub-name"><a href="{{sub.url}}">{{sub.name}}</a></div>
+			<div class="sub-delete-button"><a class="pure-button pure-button-error" ng-click="delete(sub.id)">delete</a></div>
+	</div>
+</div>
