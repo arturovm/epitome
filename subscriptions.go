@@ -58,7 +58,7 @@ func findRSSURL(rawurl string) (string, error) {
 	} else {
 		return res.Request.URL.String(), nil
 	}
-	return "", errors.New("URL not found")
+	return "", errors.New("Feed URL not found")
 }
 
 func findRSSTitle(rssUrl string) (string, error) {
@@ -89,8 +89,9 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 		rssUrl, err := findRSSURL(rawurl)
 		if err != nil {
 			// TODO: Write error func. How should the program decide what status code to send?
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(""))
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte(`{"error": "` + err.Error() + `"}`))
 			log.Printf("POST Subscription error (Find URL error): %s", err.Error())
 		} else {
 			title, err := findRSSTitle(rssUrl)
@@ -108,13 +109,15 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 				w.WriteHeader(http.StatusCreated)
 				w.Write([]byte(""))
 			} else {
+				w.Header().Set("content-type", "application/json")
 				w.WriteHeader(http.StatusConflict)
-				w.Write([]byte(""))
+				w.Write([]byte(`{"error": "Feed already exists"}`))
 			}
 		}
 	} else {
+		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Insufficient parameters: URL was not provided"))
+		w.Write([]byte(`{"error":"Insufficient parameters: URL was not provided"}`))
 	}
 }
 
