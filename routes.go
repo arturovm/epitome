@@ -10,6 +10,11 @@ func RegisterRoutes() *pat.PatternServeMux {
 	// API
 	// Auth
 	m.Get("/api/auth", http.HandlerFunc(GetAuth))
+	// Users
+	m.Post("/api/users", http.HandlerFunc(PostUser))
+	m.Get("/api/users/:id", http.HandlerFunc(GetUser))
+	m.Put("/api/users/:id", http.HandlerFunc(PutUsers))
+	m.Del("/api/users/:id", http.HandlerFunc(DeleteUser))
 	// Subscriptions
 	m.Post("/api/subscriptions", http.HandlerFunc(PostSubscription))
 	m.Get("/api/subscriptions", http.HandlerFunc(GetSubscriptions))

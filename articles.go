@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"log"
 )
 
 type Article struct {
@@ -22,4 +23,8 @@ func GetArticles(w http.ResponseWriter, req *http.Request) {
 }
 
 func PutArticle(w http.ResponseWriter, req *http.Request) {
+}
+
+func DownloadArticles() {
+	log.Println("Downloading")
 }

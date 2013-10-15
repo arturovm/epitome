@@ -1,20 +1,33 @@
-<div class="row">
-<form ng-submit="submit()" id="sub-form" class="pure-form">
-		<div class="one column alpha">
-			<label for="sub-url">URL:</label>
-		</div>
-		<div class="nine columns">
-			<input  id="sub-url" class="pure-input-1" type="url" ng-model="url">
-		</div>
-		<div class="one columns omega">
-			<a type="submit" class="pure-button pure-button-primary" ng-click="submit()">Add</a>
-		</div>
-</form>
+<div class="four columns alpha" id="nav">
+	<div class="pure-menu pure-menu-open">
+		<a class="pure-menu-heading">Pond</a>
+		<ul>
+			<li class="pure-menu-selected"><a href="#/subsciptions">Subscriptions</a></li>
+			<li><a href="#/preferences">Preferences</a></li>
+			<li class="pure-menu-separator"></li>
+			<li><a ng-click="logout()" href="#">Log Out</a></li>
+		</ul>
+	</div>
 </div>
-<hr>
-<div id="sub-list">
-	<div ng-repeat="sub in subs" class="row">
-			<div class="sub-name"><a href="{{sub.url}}">{{sub.name}}</a></div>
-			<div class="sub-delete-button"><a class="pure-button pure-button-error" ng-click="delete(sub.id)">delete</a></div>
+<div class="twelve columns omega">
+	<div class="row">
+	<form ng-submit="submit()" id="sub-form" class="pure-form">
+			<div class="one column alpha">
+				<label for="sub-url">URL:</label>
+			</div>
+			<div class="nine columns">
+				<input  id="sub-url" class="pure-input-1" type="url" ng-model="url">
+			</div>
+			<div class="two columns omega">
+				<a type="submit" class="pure-button pure-button-primary" ng-click="submit()">Add</a>
+			</div>
+	</form>
+	</div>
+	<hr>
+	<div id="sub-list">
+		<div ng-repeat="sub in subs" class="row">
+				<div class="sub-name"><a href="{{sub.url}}">{{sub.name}}</a></div>
+				<div class="sub-delete-button"><a class="pure-button pure-button-error" ng-click="delete(sub.id)">delete</a></div>
+		</div>
 	</div>
 </div>

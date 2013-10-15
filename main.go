@@ -4,19 +4,24 @@ import (
 	"database/sql"
 	"flag"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/robfig/cron"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 	"runtime"
+	"strings"
 )
 
-var ExePath string
+var (
+	ExePath         string
+	CRON            *cron.Cron
+	UserPreferences *Preferences
+)
 
 func createTables() {
 	DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
-	DB.Exec("create table users (id integer primary key, username text, password_hash text)")
+	DB.Exec("create table users (id integer primary key, username text, password_hash text, role integer)")
 	DB.Exec("create table subscriptions (id integer primary key, url text, name text)")
 	DB.Exec("create table articles (id integer primary key, url text, name text, author text, published integer, subscription_id integer references subscriptions(id), body text, read bool)")
 	DB.Exec("create table read_articles (id integer primary key, user_id integer references users(id), article_id integer references articles(id), read bool)")
@@ -24,7 +29,7 @@ func createTables() {
 	// select articles.id, url, author, published, subscription_id, body, read_articles.read from articles inner join read_articles on articles.id = read_articles.article_id <-- read articles
 	// select articles.id, url, author, published, subscription_id, body, articles.read from articles left outer join read_articles on articles.id = read_articles.article_id where read_articles.id is null <-- unread articles
 	// select articles.id, url, author, published, subscription_id, body, coalesce(articles.read, read_articles.read) from articles left outer join read_articles on articles.id = read_articles.article_id <-- all articles
-	// 
+	//
 	if err := DB.Close(); err != nil {
 		log.Fatal(err)
 	}
@@ -47,6 +52,7 @@ func main() {
 		}
 		createTables()
 	}
+	ReloadPreferences()
 	m := RegisterRoutes()
 	http.Handle("/api/", m)
 	http.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir(ExePath+"/static"))))

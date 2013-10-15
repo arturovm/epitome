@@ -8,4 +8,6 @@ angular.module('pond', ['ngRoute']).config(['$routeProvider', function($routePro
 	}).otherwise({
 		redirectTo: '/subscriptions'
 	});
-}]);
+}]).run(function() {
+
+});

@@ -1,3 +1,4 @@
+*.gob
 main
 .DS_Store
 *.swp

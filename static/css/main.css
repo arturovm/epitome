@@ -31,15 +31,33 @@ p {
 	font-family: source-sans-pro, sans-serif;
 }
 
+#nav li {
+	margin: 0;
+}
+
 #nav li a {
-	/*text-decoration: none;*/
+	padding: 1rem 0;
+}
+
+#nav li.pure-menu-selected a {
+	color: white;
+	background: rgb(10, 130, 241);
+}
+
+#nav li.pure-menu-selected a:hover {
+	color: white;
+	background: rgb(10, 130, 241);
+}
+
+/*#nav li a {
+	text-decoration: none;
 	color: #0e0e0e;
 }
 
 #nav li a:hover {
-	/*text-decoration: underline;*/
+	text-decoration: underline;
 	color: #0e0e0e;
-}
+}*/
 
 .sub-name {
 	width: 80%;
@@ -50,7 +68,7 @@ p {
 .sub-delete-button {
 	width: 20%;
 	float: left;
-	text-align: center;
+	text-align: right;
 }
 
 .sub-delete-button a {
@@ -58,10 +76,13 @@ p {
 	padding: 1rem;
 }
 
-.sub-form {
-	text-align: center;
+#sub-form {
 	vertical-align: middle;
 	display: inline;
+}
+
+#sub-form .omega {
+	text-align: right;
 }
 
 .pure-button-success,
