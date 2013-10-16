@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/gob"
 	"github.com/robfig/cron"
+	"net/http"
 	"os"
+	"encoding/json"
 )
 
 type Preferences struct {
@@ -12,7 +14,7 @@ type Preferences struct {
 }
 
 func getOrCreatePrefs() (*os.File, error) {
-	f, err := os.OpenFile(ExePath + "/prefs.gob", os.O_RDWR, 0666)
+	f, err := os.OpenFile(ExePath+"/prefs.gob", os.O_RDWR, 0666)
 	if err != nil && os.IsNotExist(err) {
 		if _, err := os.Create(ExePath + "/prefs.gob"); err != nil {
 			return nil, err
@@ -61,4 +63,36 @@ func ReloadPreferences() error {
 	CRON.AddFunc(UserPreferences.RefreshRate, DownloadArticles)
 	CRON.Start()
 	return nil
+}
+
+func GetPreferences(w http.ResponseWriter, req *http.Request) {
+	prefs, err := ReadPreferences()
+	if err != nil {
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"error": "Couldn't load preferences"}`))
+		return
+	}
+	enc := json.NewEncoder(w)
+	enc.Encode(prefs)
+}
+
+func PutPreferences(w http.ResponseWriter, req *http.Request) {
+	dec := json.NewDecoder(req.Body)
+	var prefs Preferences
+	err := dec.Decode(&prefs)
+	if err != nil {
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error": "Malformed JSON or missing field"}`))
+		return
+	}
+	err = WritePreferences(&prefs)
+	if err != nil {
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"error": "Couldn't write preferences"}`))
+		return
+	}
+	ReloadPreferences()
 }

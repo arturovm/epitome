@@ -13,7 +13,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 p {
-	font-size: 0.9rem;
+	font-size: 1.2rem;
+}
+
+label {
+	font-weight: normal;
 }
 
 .container {
@@ -49,16 +53,6 @@ p {
 	background: rgb(10, 130, 241);
 }
 
-/*#nav li a {
-	text-decoration: none;
-	color: #0e0e0e;
-}
-
-#nav li a:hover {
-	text-decoration: underline;
-	color: #0e0e0e;
-}*/
-
 .sub-name {
 	width: 80%;
 	float: left;
@@ -76,6 +70,14 @@ p {
 	padding: 1rem;
 }
 
+#login-form p {
+	font-size: 1.1rem;
+}
+
+#login-form input {
+	vertical-align: top;
+}
+
 #sub-form {
 	vertical-align: middle;
 	display: inline;
@@ -83,6 +85,23 @@ p {
 
 #sub-form .omega {
 	text-align: right;
+}
+
+#prefs-form label {
+	display: inline-block;
+	font-weight: normal;
+}
+
+#prefs-form select {
+	display: inline-block;
+	padding: 0.5rem;
+	appearance: none;
+	-moz-appearance:none;
+	-webkit-appearance:none;
+	cursor: pointer;
+	border-radius: 4px;
+	text-align: center;
+	width: 15rem;
 }
 
 .pure-button-success,

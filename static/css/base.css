@@ -128,7 +128,6 @@
 ================================================== */
 
 	.button,
-	button,
 	input[type="submit"],
 	input[type="reset"],
 	input[type="button"] {
@@ -158,7 +157,6 @@
 	  font-family: "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif; }
 
 	.button:hover,
-	button:hover,
 	input[type="submit"]:hover,
 	input[type="reset"]:hover,
 	input[type="button"]:hover {
@@ -175,7 +173,6 @@
 	  border-left: 1px solid #aaa; }
 
 	.button:active,
-	button:active,
 	input[type="submit"]:active,
 	input[type="reset"]:active,
 	input[type="button"]:active {
@@ -199,7 +196,6 @@
 		text-align: center; }
 
 	/* Fix for odd Mozilla border & padding issues */
-	button::-moz-focus-inner,
 	input::-moz-focus-inner {
     border: 0;
     padding: 0;

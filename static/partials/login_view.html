@@ -1,0 +1,21 @@
+<div class="row">
+	<div class="eight columns offset-by-four alpha">
+		<form class="pure-form pure-form-aligned" id="login-form" ng-submit="submit()">
+			<fieldset>
+				<legend>Log In</legend>
+				<div class="pure-control-group">
+					<label for="username">Username</label>
+					<input type="text" ng-model="username">
+				</div>
+				<div class="pure-control-group">
+					<label for="password">Password</label>
+					<input type="password">
+				</div>
+				<div class="pure-controls">
+					<a class="pure-button pure-button-primary" ng-click="submit()">Log in</a>
+					<p>First time here? <a href="/api/setup">Run the first–time setup.</a></p>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+</div>

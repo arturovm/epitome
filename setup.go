@@ -31,7 +31,7 @@ func GetSetup(w http.ResponseWriter, req *http.Request) {
 	}
 	var HTML = `
 	<!DOCTYPE html>
-	<html lang="en">
+	<html lang="en" ng-app="pond">
 		<head>
 			<title>Pond Setup</title>
 			<meta charset="utf-8">
@@ -39,24 +39,37 @@ func GetSetup(w http.ResponseWriter, req *http.Request) {
 			<link rel="stylesheet" href="../css/skeleton.css">
 			<link rel="stylesheet" href="../css/layout.css">
 			<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.3.0/pure-min.css">		
+			<link rel="stylesheet" href="../bower_components/alertify/themes/alertify.core.css">
+			<link rel="stylesheet" href="../bower_components/alertify/themes/alertify.default.css">
 			<link rel="stylesheet" href="../css/main.css">
 		</head>
-		<body>
+		<body ng-controller="SetupController">
 			<div class="container">
-				<form class="pure-form">
-					<legend>Create a new account</legend>
-					<label for="username">Username:</label>
-					<input type="text" id="username">
-					<label for="password">Password:</label>
-					<input type="password" id="password">
-				</form>
+				<div class="four columns offset-by-six">
+					<form ng-submit="submit()" class="pure-form pure-form-stacked">
+						<!--<legend>Create a new account</legend>
+						<label for="username">Username:</label>
+						<input type="text" id="username" ng-model="username">
+						<label for="password">Password:</label>
+						<input type="password" id="password" ng-model="password">
+						<a type="submit" class="pure-button pure-button-primary" ng-click="submit()">Create</a>-->
+
+						<label for="username">Username</label>
+						<input type="text" id="username" ng-model="username">
+						<label for="password">Password</label>
+						<input type="password" id="password" ng-model="password">
+						<button type="submit" class="pure-button pure-button-primary" value="Create">Create</button>
+					</form>
+				</div>
 			</div>
 		<script async src="http://use.edgefonts.net/source-sans-pro;droid-serif;merriweather;droid-sans.js"></script>
-		<script src="bower_components/angular/angular.js"></script>
-		<script src="bower_components/angular-route/angular-route.js"></script>
-		<script src="bower_components/alertify/alertify.min.js"></script>
-		<script src="js/controllers.js"></script>
-		<script src="js/app.js"></script>
+		<script src="../bower_components/angular/angular.min.js"></script>
+		<script src="../bower_components/angular-route/angular-route.min.js"></script>
+		<script src="../bower_components/angular-cookies/angular-cookies.min.js"></script>
+		<script src="../bower_components/alertify/alertify.min.js"></script>
+		<script src="../bower_components/spark-md5/spark-md5.min.js"></script>
+		<script src="../js/controllers.js"></script>
+		<script src="../js/app.js"></script>
 		</body>
 	</html>
 	`
