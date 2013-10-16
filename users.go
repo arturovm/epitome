@@ -27,40 +27,50 @@ type User struct {
 
 func PostUser(w http.ResponseWriter, req *http.Request) {
 	//TODO: check current user here and user role. For now, only check if open to public
-	username := req.FormValue("username")
-	usernameLower := strings.ToLower(username)
-	password := req.FormValue("password")
-	var role UserRole
-	switch req.FormValue("role") {
-	case "admin":
-		role = AdminRole
-	case "normal":
-		role = NormalRole
-	}
-	if username == "" || password == "" {
-		w.Header().Set("content-type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"error": "Insufficient parameters"}`))
-		return
-	}
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
-	if err != nil {
-		w.Header().Set("content-type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Could not hash password"}`))
-		return
-	}
-	DB, err := sql.Open("sqlite3", ExePath+"/db.db")
-	if err != nil {
-		w.Header().Set("content-type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Could not connect to database"}`))
-		return
-	}
-	defer DB.Close()
+	if (UserPreferences.NewUserPermissions == PublicRole) {
+		username := req.FormValue("username")
+		usernameLower := strings.ToLower(username)
+		password := req.FormValue("password")
+		var role UserRole
+		switch req.FormValue("role") {
+		case "admin":
+			role = AdminRole
+		case "normal":
+			role = NormalRole
+		}
+		if username == "" || password == "" {
+			WriteJSONError(w, http.StatusBadRequest, "Insufficient parameters")
+			return
+		}
+		hash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+		if err != nil {
+			WriteJSONError(w, http.StatusInternalServerError, "Couldn't hash password")
+			return
+		}
+		DB, err := sql.Open("sqlite3", ExePath+"/db.db")
+		if err != nil {
+			WriteJSONError(w, http.StatusInternalServerError, "Couldn't connect to database")
+			return
+		}
+		defer DB.Close()
 
-	DB.Exec("insert into users values (null, ?, ?, ?, ?)", usernameLower, username, hash, role)
-	w.WriteHeader(http.StatusCreated)
+		var u User
+		err = DB.QueryRow("select * from users where username = ?", usernameLower).Scan(&u.Id, &u.Username, &u.DisplayName, &u.PasswordHash, &u.Role)
+		if err == sql.ErrNoRows {
+			_, err = DB.Exec("insert into users values (null, ?, ?, ?, ?)", usernameLower, username, hash, role)
+			if err != nil {
+				WriteJSONError(w, http.StatusInternalServerError, "Unable to write to database")
+				return
+			}
+			w.WriteHeader(http.StatusCreated)
+		} else {
+			WriteJSONError(w, http.StatusConflict, "User already exists")
+			return
+		}
+	} else {
+		WriteJSONError(w, http.StatusUnauthorized, "You have insufficient permissions to create new accounts")
+		return
+	}
 }
 
 func GetUser(w http.ResponseWriter, req *http.Request) {

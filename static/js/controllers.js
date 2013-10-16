@@ -67,7 +67,7 @@ function PreferencesController($scope, $http) {
 	$scope.new_user_permissions = 2;
 	$http.get('/api/preferences').error(function(data) {
 		if (angular.isObject(data) == true && data.error != undefined) {
-			alertify.error("Error: ");
+			alertify.error("Error: " + data.error);
 		}
 	}).success(function(data) {
 		$scope.refresh_rate = data.refresh_rate;
@@ -79,7 +79,7 @@ function PreferencesController($scope, $http) {
 		var prefs = {refresh_rate: $scope.refresh_rate, new_user_permissions: $scope.new_user_permissions};
 		$http.put('/api/preferences', prefs).error(function(data) {
 			if (angular.isObject(data) == true && data.error != undefined) {
-				alertify.error("Error: ");
+				alertify.error("Error: " + data.error);
 			}
 		}).success(function(data) {
 			alertify.success("Your preferences have been saved");
@@ -87,10 +87,36 @@ function PreferencesController($scope, $http) {
 	}
 }
 
-function LoginController($scope, $http) {
+function LoginController($scope, $http, $filter, $cookieStore, $location) {
+	$scope.submit = function() {
+		if ($scope.username == undefined || $scope.password == undefined || $scope.username == "" || $scope.password == "") {
+			alertify.error("Please fill in all the fields.");
+		} else {
+			var user = $scope.username;
+			var pass = SparkMD5.hash($filter("lowercase")($scope.username) + ":" + $scope.password);
+			$http.post('/api/auth/sessions', "username=" + user + "&password=" + pass + "&appname=Pond Admin", {
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				}
+			}).error(function(data) {
+				if (angular.isObject(data) == true && data.error != undefined) {
+					alertify.error("Error: " + data.error);
+				}
+			}).success(function(data) {
+				if (angular.isObject(data) == true && data.session_token != undefined) {
+					$cookieStore.put('user', {
+						username: $scope.username,
+						session_token: data.session_token
+					});
+					$location.path('/subscriptions');
+				}
+			});
+		}
+	}
 }
 
 function SetupController($scope, $http, $filter) {
+	$scope.accountCreated = false;
 	$scope.submit = function () {
 		if ($scope.username == undefined || $scope.password == undefined || $scope.username == "" || $scope.password == "") {
 			alertify.error("Please fill in all the fields.");
@@ -101,6 +127,13 @@ function SetupController($scope, $http, $filter) {
 				headers: {
 					'Content-Type': 'application/x-www-form-urlencoded'
 				}
+			}).error(function(data) {
+				if (angular.isObject(data) == true && data.error != undefined) {
+					alertify.error("Error: " + data.error);
+				}
+			}).success(function(data) {
+				$scope.accountCreated = true;
+				alertify.success("Your account has been created successully");
 			});
 		}
 	}

@@ -9,7 +9,8 @@ func RegisterRoutes() *pat.PatternServeMux {
 	m := pat.New()
 	// API
 	// Auth
-	m.Get("/api/auth", http.HandlerFunc(GetAuth))
+	m.Post("/api/auth/sessions", http.HandlerFunc(PostSessions)) // TODO: Is this the best route?
+	m.Del("/api/auth/sessions", http.HandlerFunc(DeleteSessions))
 	// Users
 	m.Post("/api/users", http.HandlerFunc(PostUser))
 	m.Get("/api/users/:id", http.HandlerFunc(GetUser))

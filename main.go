@@ -22,6 +22,7 @@ var (
 func createTables() {
 	DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
 	DB.Exec("create table users (id integer primary key, username text, display_name text, password_hash text, role integer)")
+	DB.Exec("create table sessions (id integer primary key, username text, session_token text, app_name text, created_at string)")
 	DB.Exec("create table subscriptions (id integer primary key, url text, name text)")
 	DB.Exec("create table articles (id integer primary key, url text, name text, author text, published integer, subscription_id integer references subscriptions(id), body text, read bool)")
 	DB.Exec("create table read_articles (id integer primary key, user_id integer references users(id), article_id integer references articles(id), read bool)")

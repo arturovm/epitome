@@ -45,21 +45,21 @@ func GetSetup(w http.ResponseWriter, req *http.Request) {
 		</head>
 		<body ng-controller="SetupController">
 			<div class="container">
-				<div class="four columns offset-by-six">
+				<div class="four columns offset-by-six" ng-show="!accountCreated">
 					<form ng-submit="submit()" class="pure-form pure-form-stacked">
-						<!--<legend>Create a new account</legend>
-						<label for="username">Username:</label>
-						<input type="text" id="username" ng-model="username">
-						<label for="password">Password:</label>
-						<input type="password" id="password" ng-model="password">
-						<a type="submit" class="pure-button pure-button-primary" ng-click="submit()">Create</a>-->
-
+						<legend>Create a new account</legend>
 						<label for="username">Username</label>
 						<input type="text" id="username" ng-model="username">
 						<label for="password">Password</label>
 						<input type="password" id="password" ng-model="password">
 						<button type="submit" class="pure-button pure-button-primary" value="Create">Create</button>
 					</form>
+				</div>
+				<div class="six columns offset-by-four" ng-show="accountCreated">
+					<h1>Next steps</h1>
+					<p>Go to the <a href="/#/login">login page</a> and use your newly created account.</p>
+					<p>Depending on your intended usage, it is recommended that once you log in, you change your settings to prevent
+					strangers from the Internet from creating accounts on this server.</p>
 				</div>
 			</div>
 		<script async src="http://use.edgefonts.net/source-sans-pro;droid-serif;merriweather;droid-sans.js"></script>
