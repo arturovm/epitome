@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"errors"
 )
 
 type Session struct {
@@ -19,6 +20,24 @@ type Session struct {
 	SessionToken string    `json:"session_token"`
 	AppName      string    `json:"app_name"`
 	CreatedAt    time.Time `json:"created_at"`
+}
+
+func GetUserForSessionToken(token string) (*User, error, int) {
+	var u *User
+	DB, err := sql.Open("sqlite3", ExePath+"/db.db")
+	if err != nil {
+		return nil, errors.New("Couldn't connect to database"), 500
+	}
+	defer DB.Close()
+	err = DB.QueryRow("select username from sessions where session_token = ?", token).Scan(u.Username)
+	if err == sql.ErrNoRows {
+		return nil, errors.New("Invalid session token"), 401
+	}
+	err = DB.QueryRow("select role from users where username = ?", u.Username).Scan(u.Role)
+	if err != nil {
+		return nil, errors.New("Couldn't retrieve logged in user"), 500
+	}
+	return u, nil, 0
 }
 
 func PostSessions(w http.ResponseWriter, req *http.Request) {

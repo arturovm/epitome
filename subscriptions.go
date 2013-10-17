@@ -85,66 +85,86 @@ func findRSSTitle(rssUrl string) (string, error) {
 
 func PostSubscription(w http.ResponseWriter, req *http.Request) {
 	//TODO:  Auth should go here, but well...
-	if rawurl := req.FormValue("url"); rawurl != "" {
-		rssUrl, err := findRSSURL(rawurl)
-		if err != nil {
-			// TODO: Write error func. How should the program decide what status code to send?
-			w.Header().Set("content-type", "application/json")
-			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte(`{"error": "` + err.Error() + `"}`))
-			log.Printf("POST Subscription error (Find URL error): %s", err.Error())
-		} else {
-			title, err := findRSSTitle(rssUrl)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(""))
-				log.Printf("POST Subscription error (Find title error): %s", err.Error())
-			}
-			DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
-			defer DB.Close()
-			var sub Subscription
-			rowErr := DB.QueryRow("select * from subscriptions where url=?", rssUrl).Scan(&sub.Id, &sub.Url, &sub.Name)
-			if rowErr == sql.ErrNoRows {
-				DB.Exec("insert into subscriptions values (null, ?, ?)", rssUrl, title)
-				w.WriteHeader(http.StatusCreated)
-				w.Write([]byte(""))
-			} else {
-				w.Header().Set("content-type", "application/json")
-				w.WriteHeader(http.StatusConflict)
-				w.Write([]byte(`{"error": "Feed already exists"}`))
-			}
-		}
+	sessionToken := req.Header.Get("x-session-token")
+	if sessionToken == "" {
+		WriteJSONError(w, http.StatusBadRequest, "Session token not provided")
+		return
+	}
+	_, err, code := GetUserForSessionToken(sessionToken)
+	if err != nil {
+		WriteJSONError(w, code, err.Error())
 	} else {
-		w.Header().Set("content-type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"error":"Insufficient parameters: URL was not provided"}`))
+		if rawurl := req.FormValue("url"); rawurl != "" {
+			rssUrl, err := findRSSURL(rawurl)
+			if err != nil {
+				// TODO: Write error func. How should the program decide what status code to send?
+				w.Header().Set("content-type", "application/json")
+				w.WriteHeader(http.StatusNotFound)
+				w.Write([]byte(`{"error": "` + err.Error() + `"}`))
+				log.Printf("POST Subscription error (Find URL error): %s", err.Error())
+			} else {
+				title, err := findRSSTitle(rssUrl)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					w.Write([]byte(""))
+					log.Printf("POST Subscription error (Find title error): %s", err.Error())
+				}
+				DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
+				defer DB.Close()
+				var sub Subscription
+				rowErr := DB.QueryRow("select * from subscriptions where url=?", rssUrl).Scan(&sub.Id, &sub.Url, &sub.Name)
+				if rowErr == sql.ErrNoRows {
+					DB.Exec("insert into subscriptions values (null, ?, ?)", rssUrl, title)
+					w.WriteHeader(http.StatusCreated)
+					w.Write([]byte(""))
+				} else {
+					w.Header().Set("content-type", "application/json")
+					w.WriteHeader(http.StatusConflict)
+					w.Write([]byte(`{"error": "Feed already exists"}`))
+				}
+			}
+		} else {
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{"error":"Insufficient parameters: URL was not provided"}`))
+		}
 	}
 }
 
 func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 	// TODO: Auth
-	DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
-	rows, err := DB.Query("select * from subscriptions")
-	DB.Close()
+	sessionToken := req.Header.Get("x-session-token")
+	if sessionToken == "" {
+		WriteJSONError(w, http.StatusBadRequest, "Session token not provided")
+		return
+	}
+	_, err, code := GetUserForSessionToken(sessionToken)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(""))
-		log.Printf("GET Subscriptions error (Database error): %s", err.Error())
-	}
-	subs := make([]Subscription, 0)
-	for rows.Next() {
-		var sub Subscription
-		rows.Scan(&sub.Id, &sub.Url, &sub.Name)
-		subs = append(subs, sub)
-	}
-	rows.Close()
-	enc := json.NewEncoder(w)
-	w.Header().Set("content-type", "application/json")
-	encErr := enc.Encode(subs)
-	if encErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(""))
-		log.Printf("GET Subscriptions error (JSON encoding error): %s", err.Error())
+		WriteJSONError(w, code, err.Error())
+	} else {
+		DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
+		rows, err := DB.Query("select * from subscriptions")
+		DB.Close()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(""))
+			log.Printf("GET Subscriptions error (Database error): %s", err.Error())
+		}
+		subs := make([]Subscription, 0)
+		for rows.Next() {
+			var sub Subscription
+			rows.Scan(&sub.Id, &sub.Url, &sub.Name)
+			subs = append(subs, sub)
+		}
+		rows.Close()
+		enc := json.NewEncoder(w)
+		w.Header().Set("content-type", "application/json")
+		encErr := enc.Encode(subs)
+		if encErr != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(""))
+			log.Printf("GET Subscriptions error (JSON encoding error): %s", err.Error())
+		}
 	}
 }
 
