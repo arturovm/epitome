@@ -27,7 +27,7 @@ type User struct {
 
 func PostUser(w http.ResponseWriter, req *http.Request) {
 	//TODO: check current user here and user role. For now, only check if open to public
-	if (UserPreferences.NewUserPermissions == PublicRole) {
+	if UserPreferences.NewUserPermissions == PublicRole {
 		username := req.FormValue("username")
 		usernameLower := strings.ToLower(username)
 		password := req.FormValue("password")

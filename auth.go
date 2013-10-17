@@ -5,13 +5,13 @@ import (
 	"crypto/md5"
 	"database/sql"
 	"encoding/hex"
+	"errors"
 	_ "github.com/mattn/go-sqlite3"
 	"io"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
-	"errors"
 )
 
 type Session struct {

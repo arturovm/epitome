@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/gob"
+	"encoding/json"
 	"github.com/robfig/cron"
 	"net/http"
 	"os"
-	"encoding/json"
 )
 
 type Preferences struct {
