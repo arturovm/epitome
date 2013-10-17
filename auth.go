@@ -50,7 +50,7 @@ func PostSessions(w http.ResponseWriter, req *http.Request) {
 	md5Hash := md5.New()
 	io.WriteString(md5Hash, username+":"+strconv.Itoa(int(unixTimestamp)))
 	sessionToken := hex.EncodeToString(md5Hash.Sum(nil))
-	_, err = DB.Exec("insert into sessions values (null, ?, ?, ?, datetime(?, 'unixexpoch'))", username, sessionToken, appName, unixTimestamp)
+	_, err = DB.Exec("insert into sessions values (null, ?, ?, ?, datetime(?, 'unixepoch'))", username, sessionToken, appName, unixTimestamp)
 	if err != nil {
 		WriteJSONError(w, http.StatusInternalServerError, "Couldn't write to database")
 		return
