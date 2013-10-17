@@ -105,7 +105,7 @@ function LoginController($scope, $http, $filter, $cookieStore, $location) {
 			}).success(function(data) {
 				if (angular.isObject(data) == true && data.session_token != undefined) {
 					$cookieStore.put('user', {
-						username: $scope.username,
+						username: user,
 						session_token: data.session_token
 					});
 					$location.path('/subscriptions');
