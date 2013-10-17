@@ -16,11 +16,12 @@ type Preferences struct {
 func getOrCreatePrefs() (*os.File, error) {
 	f, err := os.OpenFile(ExePath+"/prefs.gob", os.O_RDWR, 0666)
 	if err != nil && os.IsNotExist(err) {
-		if _, err := os.Create(ExePath + "/prefs.gob"); err != nil {
+		if f, err := os.Create(ExePath + "/prefs.gob"); err != nil {
 			return nil, err
 		} else {
 			p := Preferences{"@every 30m", PublicRole}
 			WritePreferences(&p)
+			return f, nil
 		}
 	}
 	return f, err
