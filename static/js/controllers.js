@@ -1,5 +1,9 @@
-function SubscriptionsController($scope, $http) {
-	$http.get('/api/subscriptions').error(function(data) {
+function SubscriptionsController($scope, $http, $cookieStore) {
+	$http.get('/api/subscriptions', {
+		headers: {
+			'X-Session-Token': $cookieStore.get('user').session_token
+		}
+	}).error(function(data) {
 		alertify.error("Error updating feeds");
 	}).success(function(data) {
 		$scope.subs = data;
@@ -13,7 +17,8 @@ function SubscriptionsController($scope, $http) {
 		}
 		$http.post('/api/subscriptions', "url=" + url, {
 			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded'
+				'Content-Type': 'application/x-www-form-urlencoded',
+				'X-Session-Token': $cookieStore.get('user').session_token
 			}
 		}).error(function(data) {
 			if (angular.isObject(data) == true && data.error != undefined) {
@@ -30,13 +35,21 @@ function SubscriptionsController($scope, $http) {
 		});
 	}
 	$scope.delete = function(id) {
-		$http.delete('/api/subscriptions/' + id).error(function(data) {
+		$http.delete('/api/subscriptions/' + id, {
+			headers: {
+				'x-session-token': $cookieStore.get('user').session_token
+			}
+		}).error(function(data) {
 			if (angular.isObject(data) == true && data.error != undefined) {
 				alertify.error("Error deleting feed: " + data.error);
 			}
 		}).success(function(data) {
 			alertify.success("Feed deleted");
-			$http.get('/api/subscriptions').error(function(data) {
+			$http.get('/api/subscriptions', {
+				headers: {
+					'X-Session-Token': $cookieStore.get('user').session_token
+				}
+			}).error(function(data) {
 				alertify.error("Error updating feeds");
 			}).success(function(data) {
 				$scope.subs = data;

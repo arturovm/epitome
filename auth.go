@@ -23,21 +23,21 @@ type Session struct {
 }
 
 func GetUserForSessionToken(token string) (*User, error, int) {
-	var u *User
+	var u User
 	DB, err := sql.Open("sqlite3", ExePath+"/db.db")
 	if err != nil {
 		return nil, errors.New("Couldn't connect to database"), 500
 	}
 	defer DB.Close()
-	err = DB.QueryRow("select username from sessions where session_token = ?", token).Scan(u.Username)
+	err = DB.QueryRow("select username from sessions where session_token = ?", token).Scan(&u.Username)
 	if err == sql.ErrNoRows {
 		return nil, errors.New("Invalid session token"), 401
 	}
-	err = DB.QueryRow("select role from users where username = ?", u.Username).Scan(u.Role)
+	err = DB.QueryRow("select * from users where username = ?", u.Username).Scan(&u.Id, &u.Username, &u.DisplayName, &u.PasswordHash, &u.Role)
 	if err != nil {
 		return nil, errors.New("Couldn't retrieve logged in user"), 500
 	}
-	return u, nil, 0
+	return &u, nil, 0
 }
 
 func PostSessions(w http.ResponseWriter, req *http.Request) {

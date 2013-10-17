@@ -13,9 +13,10 @@ import (
 )
 
 type Subscription struct {
-	Id   int    `json:"id"`
-	Url  string `json:"url"`
-	Name string `json:"name"`
+	Id     int    `json:"id"`
+	UserId int    `json:"-"`
+	Url    string `json:"url"`
+	Name   string `json:"name"`
 }
 
 func removeTrail(rawurl string) string {
@@ -84,13 +85,12 @@ func findRSSTitle(rssUrl string) (string, error) {
 }
 
 func PostSubscription(w http.ResponseWriter, req *http.Request) {
-	//TODO:  Auth should go here, but well...
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
 		WriteJSONError(w, http.StatusBadRequest, "Session token not provided")
 		return
 	}
-	_, err, code := GetUserForSessionToken(sessionToken)
+	u, err, code := GetUserForSessionToken(sessionToken)
 	if err != nil {
 		WriteJSONError(w, code, err.Error())
 	} else {
@@ -114,7 +114,7 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 				var sub Subscription
 				rowErr := DB.QueryRow("select * from subscriptions where url=?", rssUrl).Scan(&sub.Id, &sub.Url, &sub.Name)
 				if rowErr == sql.ErrNoRows {
-					DB.Exec("insert into subscriptions values (null, ?, ?)", rssUrl, title)
+					DB.Exec("insert into subscriptions values (null, ?, ?, ?)", u.Id, rssUrl, title)
 					w.WriteHeader(http.StatusCreated)
 					w.Write([]byte(""))
 				} else {
@@ -132,18 +132,17 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 }
 
 func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
-	// TODO: Auth
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
 		WriteJSONError(w, http.StatusBadRequest, "Session token not provided")
 		return
 	}
-	_, err, code := GetUserForSessionToken(sessionToken)
+	u, err, code := GetUserForSessionToken(sessionToken)
 	if err != nil {
 		WriteJSONError(w, code, err.Error())
 	} else {
 		DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
-		rows, err := DB.Query("select * from subscriptions")
+		rows, err := DB.Query("select id, url, name from subscriptions where user_id = ?", u.Id)
 		DB.Close()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -169,21 +168,30 @@ func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 }
 
 func DeleteSubscription(w http.ResponseWriter, req *http.Request) {
-	// TODO: Auth
-	id := req.URL.Query().Get(":id")
-	var sub Subscription
-	DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
-	defer DB.Close()
-	err := DB.QueryRow("select * from subscriptions where id=?", id).Scan(&sub.Id, &sub.Url, &sub.Name)
-	switch {
-	case err == sql.ErrNoRows:
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("Subscription does not exist"))
-	case err != nil:
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(""))
-		log.Printf("DELETE subscription error (Database error): %s", err.Error())
-	default:
-		DB.Exec("delete from subscriptions where id=?", id)
+	sessionToken := req.Header.Get("x-session-token")
+	if sessionToken == "" {
+		WriteJSONError(w, http.StatusBadRequest, "Session token not provided")
+		return
+	}
+	u, err, code := GetUserForSessionToken(sessionToken)
+	if err != nil {
+		WriteJSONError(w, code, err.Error())
+	} else {
+		id := req.URL.Query().Get(":id")
+		var sub Subscription
+		DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
+		defer DB.Close()
+		err := DB.QueryRow("select * from subscriptions where id = ? and user_id = ?", id, u.Id).Scan(&sub.Id, &sub.UserId, &sub.Url, &sub.Name)
+		switch {
+		case err == sql.ErrNoRows:
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("Subscription does not exist"))
+		case err != nil:
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(""))
+			log.Printf("DELETE subscription error (Database error): %s", err.Error())
+		default:
+			DB.Exec("delete from subscriptions where id=?", id)
+		}
 	}
 }
