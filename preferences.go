@@ -67,6 +67,18 @@ func ReloadPreferences() error {
 }
 
 func GetPreferences(w http.ResponseWriter, req *http.Request) {
+	sessionToken := req.Header.Get("x-session-token")
+	if sessionToken == "" {
+		WriteJSONError(w, http.StatusBadRequest, "Session token not provided")
+		return
+	}
+	u, err, code := GetUserForSessionToken(sessionToken)
+	if err != nil {
+		WriteJSONError(w, code, err.Error())
+	} else if u.Role != AdminRole {
+		WriteJSONError(w, http.StatusUnauthorized, "You must be an administrator to read or write  server preferences")
+		return
+	}
 	prefs, err := ReadPreferences()
 	if err != nil {
 		w.Header().Set("content-type", "application/json")
@@ -79,9 +91,21 @@ func GetPreferences(w http.ResponseWriter, req *http.Request) {
 }
 
 func PutPreferences(w http.ResponseWriter, req *http.Request) {
+	sessionToken := req.Header.Get("x-session-token")
+	if sessionToken == "" {
+		WriteJSONError(w, http.StatusBadRequest, "Session token not provided")
+		return
+	}
+	u, err, code := GetUserForSessionToken(sessionToken)
+	if err != nil {
+		WriteJSONError(w, code, err.Error())
+	} else if u.Role != AdminRole {
+		WriteJSONError(w, http.StatusUnauthorized, "You must be an administrator to read or write  server preferences")
+		return
+	}
 	dec := json.NewDecoder(req.Body)
 	var prefs Preferences
-	err := dec.Decode(&prefs)
+	err = dec.Decode(&prefs)
 	if err != nil {
 		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)

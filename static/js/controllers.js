@@ -58,7 +58,7 @@ function SubscriptionsController($scope, $http, $cookieStore) {
 	}
 }
 
-function PreferencesController($scope, $http) {
+function PreferencesController($scope, $http, $cookieStore) {
 	$scope.intervalOptions = [
 		{value: "@every 5m", label: "5 minutes"},
 		{value: "@every 15m", label: "15 minutes"},
@@ -78,7 +78,11 @@ function PreferencesController($scope, $http) {
 		{value: 2, label: "The entire Internet"}
 	];
 	$scope.new_user_permissions = 2;
-	$http.get('/api/preferences').error(function(data) {
+	$http.get('/api/preferences', {
+		headers: {
+			'X-Session-Token': $cookieStore.get('user').session_token
+		}
+	}).error(function(data) {
 		if (angular.isObject(data) == true && data.error != undefined) {
 			alertify.error("Error: " + data.error);
 		}
@@ -90,7 +94,11 @@ function PreferencesController($scope, $http) {
 
 	$scope.submit = function() {
 		var prefs = {refresh_rate: $scope.refresh_rate, new_user_permissions: $scope.new_user_permissions};
-		$http.put('/api/preferences', prefs).error(function(data) {
+		$http.put('/api/preferences', prefs, {
+			headers: {
+				'X-Session-Token': $cookieStore.get('user').session_token
+			}
+		}).error(function(data) {
 			if (angular.isObject(data) == true && data.error != undefined) {
 				alertify.error("Error: " + data.error);
 			}
