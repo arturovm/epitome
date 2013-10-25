@@ -113,20 +113,27 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 				defer DB.Close()
 				var sub Subscription
 				rowErr := DB.QueryRow("select * from subscriptions where url=?", rssUrl).Scan(&sub.Id, &sub.Url, &sub.Name)
-				if rowErr == sql.ErrNoRows {
-					DB.Exec("insert into subscriptions values (null, ?, ?, ?)", u.Id, rssUrl, title)
+				if rowErr == nil {
+					rowErr = DB.QueryRow("select * from user_subscriptions where subscription_id=? and user_id=?", sub.Id, u.Id).Scan()
+					if rowErr == sql.ErrNoRows {
+						DB.Exec("insert into user_subscriptions values (null, ?, ?)", sub.Id, u.Id)
+						w.WriteHeader(http.StatusCreated)
+						return
+					} else {
+						WriteJSONError(w, http.StatusConflict, "Feed already exists")
+						return
+					}
+				} else if rowErr == sql.ErrNoRows {
+					DB.Exec("insert into subscriptions values (null, ?, ?)", rssUrl, title)
+					DB.QueryRow("select id from subscriptions where url=?", rssUrl).Scan(&sub.Id)
+					DB.Exec("insert into user_subscriptions values (null, ?, ?)", sub.Id, u.Id)
 					w.WriteHeader(http.StatusCreated)
-					w.Write([]byte(""))
-				} else {
-					w.Header().Set("content-type", "application/json")
-					w.WriteHeader(http.StatusConflict)
-					w.Write([]byte(`{"error": "Feed already exists"}`))
+					return
 				}
 			}
 		} else {
-			w.Header().Set("content-type", "application/json")
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(`{"error":"Insufficient parameters: URL was not provided"}`))
+			WriteJSONError(w, http.StatusBadRequest, "Insufficient parameters: URL was not provided")
+			return
 		}
 	}
 }
@@ -141,21 +148,41 @@ func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		WriteJSONError(w, code, err.Error())
 	} else {
+		global := req.FormValue("global")
 		DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
-		rows, err := DB.Query("select id, url, name from subscriptions where user_id = ?", u.Id)
-		DB.Close()
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(""))
-			log.Printf("GET Subscriptions error (Database error): %s", err.Error())
-		}
+		defer DB.Close()
+
 		subs := make([]Subscription, 0)
-		for rows.Next() {
-			var sub Subscription
-			rows.Scan(&sub.Id, &sub.Url, &sub.Name)
-			subs = append(subs, sub)
+
+		switch global {
+		case "true":
+			rows, err := DB.Query("select * from subscriptions")
+			if err != nil {
+				log.Printf("GET Subscriptions error (Database error): %s", err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			for rows.Next() {
+				var sub Subscription
+				rows.Scan(&sub.Id, &sub.Url, &sub.Name)
+				subs = append(subs, sub)
+			}
+			rows.Close()
+		default:
+			rows, err := DB.Query("select subscription_id from user_subscriptions where user_id=?", u.Id)
+			if err != nil {
+				log.Printf("GET Subscriptions error (Database error): %s", err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			for rows.Next() {
+				var sub Subscription
+				rows.Scan(&sub.Id)
+				DB.QueryRow("select url, name from subscriptions where id=?", sub.Id).Scan(&sub.Url, &sub.Name)
+				subs = append(subs, sub)
+			}
+			rows.Close()
 		}
-		rows.Close()
 		enc := json.NewEncoder(w)
 		w.Header().Set("content-type", "application/json")
 		encErr := enc.Encode(subs)
@@ -178,10 +205,11 @@ func DeleteSubscription(w http.ResponseWriter, req *http.Request) {
 		WriteJSONError(w, code, err.Error())
 	} else {
 		id := req.URL.Query().Get(":id")
-		var sub Subscription
+		global := req.FormValue("global")
 		DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
 		defer DB.Close()
-		err := DB.QueryRow("select * from subscriptions where id = ? and user_id = ?", id, u.Id).Scan(&sub.Id, &sub.UserId, &sub.Url, &sub.Name)
+		var dummy int
+		err := DB.QueryRow("select id from subscriptions where id = ?", id).Scan(&dummy)
 		switch {
 		case err == sql.ErrNoRows:
 			w.WriteHeader(http.StatusNotFound)
@@ -191,7 +219,21 @@ func DeleteSubscription(w http.ResponseWriter, req *http.Request) {
 			w.Write([]byte(""))
 			log.Printf("DELETE subscription error (Database error): %s", err.Error())
 		default:
-			DB.Exec("delete from subscriptions where id=?", id)
+			if global == "true" {
+				DB.Exec("delete from subscriptions where id=?", id)
+				DB.Exec("delete from user_subscriptions where subscription_id=?", id)
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+			var sub Subscription
+			err := DB.QueryRow("select id from user_subscriptions where subscription_id=? and user_id=?", id, u.Id).Scan(&sub.Id)
+			if err == sql.ErrNoRows {
+				WriteJSONError(w, http.StatusNotFound, "Subscription doesn't exist")
+				return
+			}
+			DB.Exec("delete from user_subscriptions where id=?", sub.Id)
+			w.WriteHeader(http.StatusOK)
+			return
 		}
 	}
 }
