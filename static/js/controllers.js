@@ -47,7 +47,7 @@ function SubscriptionsController($scope, $http, $cookieStore) {
 			alertify.success("Feed deleted");
 			$http.get('/api/subscriptions', {
 				headers: {
-					'X-Session-Token': $cookieStore.get('user').session_token
+					'x-session-token': $cookieStore.get('user').session_token
 				}
 			}).error(function(data) {
 				alertify.error("Error updating feeds");
