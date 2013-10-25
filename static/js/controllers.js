@@ -1,4 +1,4 @@
-function SubscriptionsController($scope, $http, $cookieStore) {
+function SubscriptionsController($scope, $http, $cookieStore, $location) {
 	$http.get('/api/subscriptions', {
 		headers: {
 			'X-Session-Token': $cookieStore.get('user').session_token
@@ -33,11 +33,11 @@ function SubscriptionsController($scope, $http, $cookieStore) {
 				$scope.subs = data;
 			});
 		});
-	}
+	};
 	$scope.delete = function(id) {
 		$http.delete('/api/subscriptions/' + id, {
 			headers: {
-				'x-session-token': $cookieStore.get('user').session_token
+				'X-Session-Token': $cookieStore.get('user').session_token
 			}
 		}).error(function(data) {
 			if (angular.isObject(data) == true && data.error != undefined) {
@@ -55,7 +55,22 @@ function SubscriptionsController($scope, $http, $cookieStore) {
 				$scope.subs = data;
 			});
 		});
-	}
+	};
+	$scope.logout = function() {
+		$http.delete('/api/auth/sessions/' + $cookieStore.get('user').session_token, {
+			headers: {
+				'X-Session-Token': $cookieStore.get('user').session_token
+			}
+		}).error(function(data) {
+			if (angular.isObject(data) == true && data.error != undefined) {
+				alertify.error("Error logging you out: " + data.error);
+			}
+		}).success(function(data) {
+			$cookieStore.remove('user');
+			$location.path('/login');
+			alertify.success("You are now logged out");
+		});
+	};
 }
 
 function PreferencesController($scope, $http, $cookieStore) {
@@ -105,7 +120,7 @@ function PreferencesController($scope, $http, $cookieStore) {
 		}).success(function(data) {
 			alertify.success("Your preferences have been saved");
 		});
-	}
+	};
 }
 
 function LoginController($scope, $http, $filter, $cookieStore, $location) {
@@ -133,7 +148,7 @@ function LoginController($scope, $http, $filter, $cookieStore, $location) {
 				}
 			});
 		}
-	}
+	};
 }
 
 function SetupController($scope, $http, $filter) {
@@ -157,5 +172,5 @@ function SetupController($scope, $http, $filter) {
 				alertify.success("Your account has been created successully");
 			});
 		}
-	}
+	};
 }
