@@ -27,7 +27,11 @@ function SubscriptionsController($scope, $http, $cookieStore, $location) {
 		}).success(function(data) {
 			$scope.url = "";
 			alertify.success("Feed added");
-			$http.get('/api/subscriptions').error(function(data) {
+			$http.get('/api/subscriptions', {
+				headers: {
+					'X-Session-Token': $cookieStore.get('user').session_token
+				}
+			}).error(function(data) {
 				alertify.error("Error updating feeds");
 			}).success(function(data) {
 				$scope.subs = data;
