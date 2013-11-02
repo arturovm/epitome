@@ -34,7 +34,7 @@ func UpdateArticles() {
 		subs = append(subs, sub)
 	}
 	rows.Close()
-	articleChannel := make(chan *[]Article)
+	articleChannel := make(chan *[]Article, MAX_ARTICLE_PROCS)
 	sem := make(chan int, MAX_ARTICLE_PROCS)
 	// init semaphore
 	for i := 0; i < MAX_ARTICLE_PROCS; i++ {
