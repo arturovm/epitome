@@ -61,7 +61,7 @@ func ReloadPreferences() error {
 		CRON.Stop()
 	}
 	CRON = cron.New()
-	CRON.AddFunc(UserPreferences.RefreshRate, DownloadArticles)
+	CRON.AddFunc(UserPreferences.RefreshRate, UpdateArticles)
 	CRON.Start()
 	return nil
 }
