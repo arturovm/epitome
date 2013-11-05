@@ -125,6 +125,21 @@ function PreferencesController($scope, $http, $cookieStore) {
 			alertify.success("Your preferences have been saved");
 		});
 	};
+	$scope.logout = function() {
+		$http.delete('/api/auth/sessions/' + $cookieStore.get('user').session_token, {
+			headers: {
+				'X-Session-Token': $cookieStore.get('user').session_token
+			}
+		}).error(function(data) {
+			if (angular.isObject(data) == true && data.error != undefined) {
+				alertify.error("Error logging you out: " + data.error);
+			}
+		}).success(function(data) {
+			$cookieStore.remove('user');
+			$location.path('/login');
+			alertify.success("You are now logged out");
+		});
+	};
 }
 
 function LoginController($scope, $http, $filter, $cookieStore, $location) {
