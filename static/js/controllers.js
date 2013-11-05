@@ -79,7 +79,6 @@ function SubscriptionsController($scope, $http, $cookieStore, $location) {
 
 function PreferencesController($scope, $http, $cookieStore) {
 	$scope.intervalOptions = [
-		{value: "@every 5m", label: "5 minutes"},
 		{value: "@every 15m", label: "15 minutes"},
 		{value: "@every 30m", label: "30 minutes"},
 		{value: "@every 1h", label: "hour"},
