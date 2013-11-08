@@ -4,17 +4,17 @@ _Current version:_ `0.1.0`
 
 ## Table of Contents
 
-1. Introduction & Overview
-2. Pond as a Protocol
-3. Pond as an App
-   * Installing
-   * Building
-   * Usage
-   * What's Missing for 1.0?
-4. Information for Contributors
-   * Forking
-   * Testing, Bug Reporting & Feature Requests
-   * Protocol Definition
+1. [Introduction & Overview](#introduction--overview)
+2. [Pond as a Protocol](#pond-as-a-protocol)
+3. [Pond as an App](#pond-as-an-app)
+   * [Installing](#installing)
+   * [Building](#building)
+   * [Usage](#usage)
+   * [What's Missing for 1.0?](#whats-missing-for-10)
+4. [Information for Contributors](#information-for-contributors)
+   * [Forking](#forking)
+   * [Testing, Bug Reporting & Feature Requests](#testing-bug-reporting--feature-requests)
+   * [Protocol Definition](#protocol-definition)
 
 
 ## Introduction & Overview
