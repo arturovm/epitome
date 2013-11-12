@@ -79,39 +79,39 @@ func GetAllArticles(w http.ResponseWriter, req *http.Request) {
 	u, err, code := GetUserForSessionToken(sessionToken)
 	if err != nil {
 		WriteJSONError(w, code, err.Error())
-	} else {
-		DB, err := sql.Open("sqlite3", ExePath+"/db.db")
-		if err != nil {
-			WriteJSONError(w, http.StatusInternalServerError, "Couldn't connect to database")
-			return
-		}
-		var subs []Subscription
-		subsRows, _ := DB.Query("select subscription_id from user_subscriptions where user_id = ?", u.Id)
-		for subsRows.Next() {
-			var sub Subscription
-			subsRows.Scan(&sub.Id)
-			subs = append(subs, sub)
-		}
-		subsRows.Close()
-		var subsIds []string
-		for _, v := range subs {
-			subsIds = append(subsIds, fmt.Sprintln(v.Id))
-		}
-		var articles []Article
-		rows, err := DB.Query(queryStringForRequest(req, u, &subsIds))
-		for rows.Next() {
-			var article Article
-			var dateString string
-			rows.Scan(&article.Id, &article.SubscriptionId, &article.Url, &article.Title, &article.Author, &dateString, &article.Body.Content, &article.Body.Type, &article.Summary.Content, &article.Summary.Type, &article.Read)
-			article.Published, err = time.Parse("2006-01-02 15:04:05", dateString)
-			article.Body.Content = html.EscapeString(article.Body.Content)
-			article.Summary.Content = html.EscapeString(article.Summary.Content)
-			articles = append(articles, article)
-		}
-		enc := json.NewEncoder(w)
-		w.Header().Set("content-type", "application/json")
-		enc.Encode(articles)
+		return
 	}
+	DB, err := sql.Open("sqlite3", ExePath+"/db.db")
+	if err != nil {
+		WriteJSONError(w, http.StatusInternalServerError, "Couldn't connect to database")
+		return
+	}
+	var subs []Subscription
+	subsRows, _ := DB.Query("select subscription_id from user_subscriptions where user_id = ?", u.Id)
+	for subsRows.Next() {
+		var sub Subscription
+		subsRows.Scan(&sub.Id)
+		subs = append(subs, sub)
+	}
+	subsRows.Close()
+	var subsIds []string
+	for _, v := range subs {
+		subsIds = append(subsIds, fmt.Sprintln(v.Id))
+	}
+	var articles []Article
+	rows, err := DB.Query(queryStringForRequest(req, u, &subsIds))
+	for rows.Next() {
+		var article Article
+		var dateString string
+		rows.Scan(&article.Id, &article.SubscriptionId, &article.Url, &article.Title, &article.Author, &dateString, &article.Body.Content, &article.Body.Type, &article.Summary.Content, &article.Summary.Type, &article.Read)
+		article.Published, err = time.Parse("2006-01-02 15:04:05", dateString)
+		article.Body.Content = html.EscapeString(article.Body.Content)
+		article.Summary.Content = html.EscapeString(article.Summary.Content)
+		articles = append(articles, article)
+	}
+	enc := json.NewEncoder(w)
+	w.Header().Set("content-type", "application/json")
+	enc.Encode(articles)
 }
 
 func GetArticles(w http.ResponseWriter, req *http.Request) {
@@ -123,35 +123,35 @@ func GetArticles(w http.ResponseWriter, req *http.Request) {
 	u, err, code := GetUserForSessionToken(sessionToken)
 	if err != nil {
 		WriteJSONError(w, code, err.Error())
-	} else {
-		subId := req.URL.Query().Get(":id")
-		DB, err := sql.Open("sqlite3", ExePath+"/db.db")
-		if err != nil {
-			WriteJSONError(w, http.StatusInternalServerError, "Couldn't connect to database")
-			return
-		}
-		var id int
-		err = DB.QueryRow("select id from user_subscriptions where user_id = ? and subscription_id = ?", u.Id, subId).Scan(&id)
-		if err == sql.ErrNoRows {
-			WriteJSONError(w, http.StatusNotFound, "Subscription doesn't exist")
-			return
-		}
-		subsIds := []string{subId}
-		var articles []Article
-		rows, _ := DB.Query(queryStringForRequest(req, u, &subsIds))
-		for rows.Next() {
-			var article Article
-			var dateString string
-			rows.Scan(&article.Id, &article.SubscriptionId, &article.Url, &article.Title, &article.Author, &dateString, &article.Body.Content, &article.Body.Type, &article.Summary.Content, &article.Summary.Type, &article.Read)
-			article.Published, err = time.Parse("2006-01-02 15:04:05", dateString)
-			article.Body.Content = html.EscapeString(article.Body.Content)
-			article.Summary.Content = html.EscapeString(article.Summary.Content)
-			articles = append(articles, article)
-		}
-		enc := json.NewEncoder(w)
-		w.Header().Set("content-type", "application/json")
-		enc.Encode(articles)
+		return
 	}
+	subId := req.URL.Query().Get(":id")
+	DB, err := sql.Open("sqlite3", ExePath+"/db.db")
+	if err != nil {
+		WriteJSONError(w, http.StatusInternalServerError, "Couldn't connect to database")
+		return
+	}
+	var id int
+	err = DB.QueryRow("select id from user_subscriptions where user_id = ? and subscription_id = ?", u.Id, subId).Scan(&id)
+	if err == sql.ErrNoRows {
+		WriteJSONError(w, http.StatusNotFound, "Subscription doesn't exist")
+		return
+	}
+	subsIds := []string{subId}
+	var articles []Article
+	rows, _ := DB.Query(queryStringForRequest(req, u, &subsIds))
+	for rows.Next() {
+		var article Article
+		var dateString string
+		rows.Scan(&article.Id, &article.SubscriptionId, &article.Url, &article.Title, &article.Author, &dateString, &article.Body.Content, &article.Body.Type, &article.Summary.Content, &article.Summary.Type, &article.Read)
+		article.Published, err = time.Parse("2006-01-02 15:04:05", dateString)
+		article.Body.Content = html.EscapeString(article.Body.Content)
+		article.Summary.Content = html.EscapeString(article.Summary.Content)
+		articles = append(articles, article)
+	}
+	enc := json.NewEncoder(w)
+	w.Header().Set("content-type", "application/json")
+	enc.Encode(articles)
 }
 
 func PutArticle(w http.ResponseWriter, req *http.Request) {
@@ -163,46 +163,46 @@ func PutArticle(w http.ResponseWriter, req *http.Request) {
 	u, err, code := GetUserForSessionToken(sessionToken)
 	if err != nil {
 		WriteJSONError(w, code, err.Error())
-	} else {
-		subId := req.URL.Query().Get(":subid")
-		artId := req.URL.Query().Get(":artid")
-		status := req.FormValue("status")
-		DB, err := sql.Open("sqlite3", ExePath+"/db.db")
-		if err != nil {
-			WriteJSONError(w, http.StatusInternalServerError, "Couldn't connect to database")
-			return
-		}
-		//var id int
-		err = DB.QueryRow("select subscription_id from user_subscriptions where user_id = ? and subscription_id = ?", u.Id, subId).Scan()
-		if err == sql.ErrNoRows {
-			WriteJSONError(w, http.StatusNotFound, "Subscription doesn't exist")
-			return
-		}
-		var article Article
-		err = DB.QueryRow("select id from articles where subscription_id = ? and id = ?", subId, artId).Scan(&article.Id)
-		if err == sql.ErrNoRows {
-			WriteJSONError(w, http.StatusNotFound, "Article doesn't exist")
-			return
-		}
-		var alreadyRead bool
-		err = DB.QueryRow("select id from user_read_articles where article_id = ? and user_id = ?", artId, u.Id).Scan()
-		if err == sql.ErrNoRows {
-			alreadyRead = false
-		} else {
-			alreadyRead = true
-		}
-		switch status {
-		case "read":
-			if alreadyRead != true {
-				DB.Exec("insert into user_read_articles values (null, ?, ?, ?)", u.Id, artId, false)
-			}
-		case "unread":
-			if alreadyRead == true {
-				DB.Exec("delete from user_read_articles where user_id = ? and article_id = ?", u.Id, artId)
-			}
-		}
-		w.WriteHeader(http.StatusOK)
+		return
 	}
+	subId := req.URL.Query().Get(":subid")
+	artId := req.URL.Query().Get(":artid")
+	status := req.FormValue("status")
+	DB, err := sql.Open("sqlite3", ExePath+"/db.db")
+	if err != nil {
+		WriteJSONError(w, http.StatusInternalServerError, "Couldn't connect to database")
+		return
+	}
+	//var id int
+	err = DB.QueryRow("select subscription_id from user_subscriptions where user_id = ? and subscription_id = ?", u.Id, subId).Scan()
+	if err == sql.ErrNoRows {
+		WriteJSONError(w, http.StatusNotFound, "Subscription doesn't exist")
+		return
+	}
+	var article Article
+	err = DB.QueryRow("select id from articles where subscription_id = ? and id = ?", subId, artId).Scan(&article.Id)
+	if err == sql.ErrNoRows {
+		WriteJSONError(w, http.StatusNotFound, "Article doesn't exist")
+		return
+	}
+	var alreadyRead bool
+	err = DB.QueryRow("select id from user_read_articles where article_id = ? and user_id = ?", artId, u.Id).Scan()
+	if err == sql.ErrNoRows {
+		alreadyRead = false
+	} else {
+		alreadyRead = true
+	}
+	switch status {
+	case "read":
+		if alreadyRead != true {
+			DB.Exec("insert into user_read_articles values (null, ?, ?, ?)", u.Id, artId, false)
+		}
+	case "unread":
+		if alreadyRead == true {
+			DB.Exec("delete from user_read_articles where user_id = ? and article_id = ?", u.Id, artId)
+		}
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 /*

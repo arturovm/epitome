@@ -44,7 +44,7 @@ func PostUser(w http.ResponseWriter, req *http.Request) {
 		}
 		hash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 		if err != nil {
-			WriteJSONError(w, http.StatusInternalServerError, "Couldn't hash password")
+			WriteJSONError(w, http.StatusInternalServerError, "Bcrypt Error")
 			return
 		}
 		DB, err := sql.Open("sqlite3", ExePath+"/db.db")

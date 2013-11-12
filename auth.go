@@ -90,20 +90,20 @@ func DeleteSessions(w http.ResponseWriter, req *http.Request) {
 	u, err, code := GetUserForSessionToken(sessionToken)
 	if err != nil {
 		WriteJSONError(w, code, err.Error())
-	} else {
-		token := req.URL.Query().Get(":token")
-		DB, err := sql.Open("sqlite3", ExePath+"/db.db")
-		defer DB.Close()
-		if err != nil {
-			WriteJSONError(w, http.StatusInternalServerError, "Couldn't connect to database")
-			return
-		}
-		_, err = DB.Exec("delete from sessions where session_token=? and username=?", token, u.Username)
-		if err != nil {
-			WriteJSONError(w, http.StatusInternalServerError, "Unable to delete session")
-			return
-		}
-		w.WriteHeader(http.StatusOK)
 		return
 	}
+	token := req.URL.Query().Get(":token")
+	DB, err := sql.Open("sqlite3", ExePath+"/db.db")
+	defer DB.Close()
+	if err != nil {
+		WriteJSONError(w, http.StatusInternalServerError, "Couldn't connect to database")
+		return
+	}
+	_, err = DB.Exec("delete from sessions where session_token=? and username=?", token, u.Username)
+	if err != nil {
+		WriteJSONError(w, http.StatusInternalServerError, "Unable to delete session")
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	return
 }
