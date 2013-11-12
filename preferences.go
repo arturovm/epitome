@@ -6,6 +6,7 @@ import (
 	"github.com/robfig/cron"
 	"net/http"
 	"os"
+	"time"
 )
 
 type Preferences struct {
@@ -19,7 +20,7 @@ func getOrCreatePrefs() (*os.File, error) {
 		if f, err := os.Create(ExePath + "/prefs.gob"); err != nil {
 			return nil, err
 		} else {
-			p := Preferences{"@every 30m", PublicRole}
+			p := Preferences{"30m", PublicRole}
 			WritePreferences(&p)
 			return f, nil
 		}
@@ -61,7 +62,7 @@ func ReloadPreferences() error {
 		CRON.Stop()
 	}
 	CRON = cron.New()
-	CRON.AddFunc(UserPreferences.RefreshRate, UpdateArticles)
+	CRON.AddFunc("@every "+UserPreferences.RefreshRate, UpdateArticles)
 	CRON.Start()
 	return nil
 }
@@ -107,16 +108,17 @@ func PutPreferences(w http.ResponseWriter, req *http.Request) {
 	var prefs Preferences
 	err = dec.Decode(&prefs)
 	if err != nil {
-		w.Header().Set("content-type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"error": "Malformed JSON or missing field"}`))
+		WriteJSONError(w, http.StatusBadRequest, "Malformed JSON or missing field")
+		return
+	}
+	_, err = time.ParseDuration(prefs.RefreshRate)
+	if err != nil {
+		WriteJSONError(w, http.StatusBadRequest, "Invalid duration")
 		return
 	}
 	err = WritePreferences(&prefs)
 	if err != nil {
-		w.Header().Set("content-type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Couldn't write preferences"}`))
+		WriteJSONError(w, http.StatusInternalServerError, "Couldn't write preferences")
 		return
 	}
 	ReloadPreferences()

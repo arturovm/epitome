@@ -79,14 +79,14 @@ function SubscriptionsController($scope, $http, $cookieStore, $location) {
 
 function PreferencesController($scope, $http, $cookieStore) {
 	$scope.intervalOptions = [
-		{value: "@every 15m", label: "15 minutes"},
-		{value: "@every 30m", label: "30 minutes"},
-		{value: "@every 1h", label: "hour"},
-		{value: "@every 2h", label:"2 hours"},
-		{value: "@every 8h", label: "8 hours"},
-		{value: "@every 12h", label: "12 hours"},
-		{value: "@every 1d", label: "day"},
-		{value: "@every 2d", label: "2 days"}
+		{value: "15m", label: "15 minutes"},
+		{value: "30m", label: "30 minutes"},
+		{value: "1h", label: "hour"},
+		{value: "2h", label:"2 hours"},
+		{value: "8h", label: "8 hours"},
+		{value: "12h", label: "12 hours"},
+		{value: "1d", label: "day"},
+		{value: "2d", label: "2 days"}
 	];
 	$scope.refresh_rate = "@every 30m";
 
