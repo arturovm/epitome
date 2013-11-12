@@ -95,6 +95,10 @@ Atom is amazing and awesome and unicorns and rainbows. RSS is not. RSS is a mess
 
 Which will very likely be added in 0.2.0
 
+#### Favorites API
+
+Which will also very likely be added in a near–future minor version.
+
 #### That's it?
 
 No. I'm sure more things will be added to this section as time goes by.
