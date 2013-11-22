@@ -201,6 +201,9 @@ func PutArticle(w http.ResponseWriter, req *http.Request) {
 		if alreadyRead == true {
 			DB.Exec("delete from user_read_articles where user_id = ? and article_id = ?", u.Id, artId)
 		}
+	default:
+		WriteJSONError(w, http.StatusBadRequest, "Valid values for 'status' are 'read' and 'unread'")
+		return
 	}
 	w.WriteHeader(http.StatusOK)
 }
