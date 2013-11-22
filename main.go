@@ -32,10 +32,6 @@ func createTables() {
 	DB.Exec("create table articles (id integer primary key, subscription_id integer references subscriptions(id), url text, title text, author text, published integer, body text, body_type text, summary text, summary_type text, read bool)")
 	DB.Exec("create table user_read_articles (id integer primary key, user_id integer references users(id), article_id integer references articles(id), read bool)")
 	DB.Exec("create table favorites (id integer primary key, url text, name text, author text, published integer, body text)")
-	// select articles.id, url, author, published, subscription_id, body, read_articles.read from articles inner join read_articles on articles.id = read_articles.article_id <-- read articles
-	// select articles.id, url, author, published, subscription_id, body, articles.read from articles left outer join read_articles on articles.id = read_articles.article_id where read_articles.id is null <-- unread articles
-	// select articles.id, url, author, published, subscription_id, body, coalesce(articles.read, read_articles.read) from articles left outer join read_articles on articles.id = read_articles.article_id <-- all articles
-	//
 	if err := DB.Close(); err != nil {
 		log.Fatal(err)
 	}
