@@ -10,8 +10,8 @@ import (
 )
 
 type Preferences struct {
-	RefreshRate        string   `json:"refresh_rate"`
-	NewUserPermissions UserRole `json:"new_user_permissions"`
+	RefreshRate        *string   `json:"refresh_rate"`
+	NewUserPermissions *UserRole `json:"new_user_permissions"`
 }
 
 func getOrCreatePrefs() (*os.File, error) {
@@ -20,15 +20,17 @@ func getOrCreatePrefs() (*os.File, error) {
 		if f, err := os.Create(ExePath + "/prefs.gob"); err != nil {
 			return nil, err
 		} else {
-			p := Preferences{"30m", PublicRole}
-			WritePreferences(&p)
+			interval := "30m"
+			role := PublicRole
+			p := Preferences{&interval, &role}
+			writePreferences(&p)
 			return f, nil
 		}
 	}
 	return f, err
 }
 
-func WritePreferences(prefs *Preferences) error {
+func writePreferences(prefs *Preferences) error {
 	prefFile, err := getOrCreatePrefs()
 	if err != nil {
 		return err
@@ -38,7 +40,7 @@ func WritePreferences(prefs *Preferences) error {
 	return err
 }
 
-func ReadPreferences() (*Preferences, error) {
+func readPreferences() (*Preferences, error) {
 	f, err := getOrCreatePrefs()
 	if err != nil {
 		return nil, err
@@ -49,11 +51,14 @@ func ReadPreferences() (*Preferences, error) {
 	if err != nil {
 		return nil, err
 	}
+	if prefs.NewUserPermissions == nil {
+		prefs.NewUserPermissions = new(UserRole)
+	}
 	return &prefs, nil
 }
 
 func ReloadPreferences() error {
-	prefs, err := ReadPreferences()
+	prefs, err := readPreferences()
 	if err != nil {
 		return err
 	}
@@ -62,7 +67,7 @@ func ReloadPreferences() error {
 		CRON.Stop()
 	}
 	CRON = cron.New()
-	CRON.AddFunc("@every "+UserPreferences.RefreshRate, UpdateArticles)
+	CRON.AddFunc("@every "+*UserPreferences.RefreshRate, UpdateArticles)
 	CRON.Start()
 	return nil
 }
@@ -80,7 +85,7 @@ func GetPreferences(w http.ResponseWriter, req *http.Request) {
 		WriteJSONError(w, http.StatusUnauthorized, "You must be an administrator to read or write  server preferences")
 		return
 	}
-	prefs, err := ReadPreferences()
+	prefs, err := readPreferences()
 	if err != nil {
 		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -108,15 +113,30 @@ func PutPreferences(w http.ResponseWriter, req *http.Request) {
 	var prefs Preferences
 	err = dec.Decode(&prefs)
 	if err != nil {
-		WriteJSONError(w, http.StatusBadRequest, "Malformed JSON or missing field")
+		WriteJSONError(w, http.StatusBadRequest, "Malformed JSON")
 		return
 	}
-	_, err = time.ParseDuration(prefs.RefreshRate)
+	if prefs.NewUserPermissions == nil && prefs.RefreshRate == nil {
+		WriteJSONError(w, http.StatusBadRequest, "You must provide at least one field")
+		return
+	}
+	currentPrefs, err := readPreferences()
 	if err != nil {
-		WriteJSONError(w, http.StatusBadRequest, "Invalid duration")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	err = WritePreferences(&prefs)
+	if prefs.NewUserPermissions != nil {
+		currentPrefs.NewUserPermissions = prefs.NewUserPermissions
+	}
+	if prefs.RefreshRate != nil {
+		_, err = time.ParseDuration(*prefs.RefreshRate)
+		if err != nil {
+			WriteJSONError(w, http.StatusBadRequest, "Invalid duration")
+			return
+		}
+		currentPrefs.RefreshRate = prefs.RefreshRate
+	}
+	err = writePreferences(currentPrefs)
 	if err != nil {
 		WriteJSONError(w, http.StatusInternalServerError, "Couldn't write preferences")
 		return

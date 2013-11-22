@@ -27,7 +27,7 @@ type User struct {
 
 func PostUser(w http.ResponseWriter, req *http.Request) {
 	uAuth, err, _ := GetUserForSessionToken(req.Header.Get("x-session-token"))
-	if UserPreferences.NewUserPermissions != PublicRole && (uAuth == nil || uAuth.Role > UserPreferences.NewUserPermissions) {
+	if *UserPreferences.NewUserPermissions != PublicRole && (uAuth == nil || uAuth.Role > *UserPreferences.NewUserPermissions) {
 		WriteJSONError(w, http.StatusUnauthorized, "Insufficient permissions to create new accounts")
 		return
 	}
