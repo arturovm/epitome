@@ -100,17 +100,16 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 	if rawurl := req.FormValue("url"); rawurl != "" {
 		rssUrl, err := findRSSURL(rawurl)
 		if err != nil {
-			// TODO: Write error func. How should the program decide what status code to send?
-			w.Header().Set("content-type", "application/json")
-			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte(`{"error": "` + err.Error() + `"}`))
+			WriteJSONError(w, http.StatusNotFound, "Could not find feed.")
 			log.Printf("POST Subscription error (Find URL error): %s", err.Error())
+			return
 		} else {
 			title, err := findRSSTitle(rssUrl)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(""))
 				log.Printf("POST Subscription error (Find title error): %s", err.Error())
+				return
 			}
 			DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
 			defer DB.Close()
@@ -159,6 +158,10 @@ func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 
 	switch global {
 	case "true":
+		if u.Role != AdminRole {
+			WriteJSONError(w, http.StatusUnauthorized, "You don't have enough permissions to view global subscriptions")
+			return
+		}
 		rows, err := DB.Query("select * from subscriptions")
 		if err != nil {
 			log.Printf("GET Subscriptions error (Database error): %s", err.Error())
@@ -215,14 +218,18 @@ func DeleteSubscription(w http.ResponseWriter, req *http.Request) {
 	err = DB.QueryRow("select id from subscriptions where id = ?", id).Scan(&dummy)
 	switch {
 	case err == sql.ErrNoRows:
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("Subscription does not exist"))
+		WriteJSONError(w, http.StatusNotFound, "Subscription does not exist")
+		return
 	case err != nil:
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(""))
 		log.Printf("DELETE subscription error (Database error): %s", err.Error())
 	default:
 		if global == "true" {
+			if u.Role != AdminRole {
+				WriteJSONError(w, http.StatusUnauthorized, "You don't have enough permissions to delete global subscriptions")
+				return
+			}
 			DB.Exec("delete from subscriptions where id=?", id)
 			DB.Exec("delete from user_subscriptions where subscription_id=?", id)
 			w.WriteHeader(http.StatusOK)
