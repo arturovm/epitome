@@ -117,7 +117,7 @@ func PutPreferences(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	if prefs.NewUserPermissions == nil && prefs.RefreshRate == nil {
-		WriteJSONError(w, http.StatusBadRequest, "You must provide at least one field")
+		WriteJSONError(w, http.StatusBadRequest, "You must provide at least one valid field")
 		return
 	}
 	currentPrefs, err := readPreferences()
@@ -126,12 +126,15 @@ func PutPreferences(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	if prefs.NewUserPermissions != nil {
+		if *prefs.NewUserPermissions > PublicRole || *prefs.NewUserPermissions < AdminRole {
+			WriteJSONError(w, http.StatusBadRequest, "Invalid value for 'new_user_permissions'; possible values are [0, 2]")
+		}
 		currentPrefs.NewUserPermissions = prefs.NewUserPermissions
 	}
 	if prefs.RefreshRate != nil {
 		_, err = time.ParseDuration(*prefs.RefreshRate)
 		if err != nil {
-			WriteJSONError(w, http.StatusBadRequest, "Invalid duration")
+			WriteJSONError(w, http.StatusBadRequest, "Invalid value for 'refresh_rate'; the valid format is '(([0-9])+h)?(([0-9])+m)?(([0-9])+s)'")
 			return
 		}
 		currentPrefs.RefreshRate = prefs.RefreshRate
