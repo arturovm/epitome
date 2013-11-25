@@ -154,7 +154,9 @@ func formatAtom(sub *Subscription, doc *xml.XmlDocument, articles *[]Article) {
 		article.Published = pub.UTC()
 		// Author
 		authorNodes, _ := v.Search(v.Path() + "/author/name")
-		article.Author = authorNodes[0].Content()
+		if len(authorNodes) > 0 {
+			article.Author = authorNodes[0].Content()
+		}
 		// Summary
 		summaryNodes, _ := v.Search(v.Path() + "/summary")
 		if len(summaryNodes) > 0 {
