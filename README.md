@@ -1,6 +1,6 @@
 # Pond
 
-_Current version:_ `0.1.0`
+_Current version:_ `0.1.1`
 
 ## Table of Contents
 
