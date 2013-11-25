@@ -52,7 +52,9 @@ func findRSSURL(rawurl string) (string, error) {
 				if u.IsAbs() {
 					return u.String(), nil
 				} else {
-					u.Host = removeTrail(rawurl)
+					baseU, _ := url.Parse(rawurl)
+					u.Scheme = baseU.Scheme
+					u.Host = baseU.Host
 					return u.String(), nil
 				}
 			}
