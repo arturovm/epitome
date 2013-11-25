@@ -89,7 +89,7 @@ To specify a port other than the default one, use the `-p` flag:
 
 #### First and foremost? Testing, testing, testing.
 
-Atom is amazing and awesome and unicorns and rainbows. RSS is not. RSS is a messy pain in the ass—kinda like diarrhea. I need people to test the program and try to break it (bug reporting will be _very_ appreaciated), so I can sort out all the little quirks and handle all sorts of use cases, and make the Pond reference implementation much more robust over time.
+Atom is amazing and awesome and unicorns and rainbows. RSS is not. RSS is a messy pain in the ass—kinda like diarrhea. I need people to test the program and try to break it (bug reporting will be _very_ appreciated), so I can sort out all the little quirks and handle all sorts of use cases, and make the Pond reference implementation much more robust over time.
 
 #### OPML Import and Export
 
