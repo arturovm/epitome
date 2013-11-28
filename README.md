@@ -99,6 +99,10 @@ Which will very likely be added in 0.2.0
 
 Which will also very likely be added in a near–future minor version.
 
+#### Support for Enclosures
+
+This involves a JSON schema addition. Might be tackled on 0.2.x
+
 #### That's it?
 
 No. I'm sure more things will be added to this section as time goes by.
