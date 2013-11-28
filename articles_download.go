@@ -208,8 +208,10 @@ func formatRSS(sub *Subscription, doc *xml.XmlDocument, articles *[]Article) {
 		}
 		// Summary
 		summaryNodes, _ := v.Search(v.Path() + "/description")
-		article.Summary.Content = summaryNodes[0].Content()
-		article.Summary.Type = "html"
+		if len(summaryNodes[0]) > 0 {
+			article.Summary.Content = summaryNodes[0].Content()
+			article.Summary.Type = "html"
+		}
 		// Body
 		// No body? Body = Summary? No summary and body contains entry description?
 		// Read
