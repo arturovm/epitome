@@ -22,6 +22,7 @@ func RegisterRoutes() *pat.PatternServeMux {
 	// Subscriptions
 	m.Post("/api/subscriptions", http.HandlerFunc(PostSubscription))
 	m.Get("/api/subscriptions", http.HandlerFunc(GetSubscriptions))
+	m.Get("/api/subscriptions:ext", http.HandlerFunc(GetSubscriptions))
 	m.Del("/api/subscriptions/:id", http.HandlerFunc(DeleteSubscription))
 	// Articles
 	m.Get("/api/subscriptions/articles", http.HandlerFunc(GetAllArticles))
