@@ -54,7 +54,7 @@ passwordHash = MD5(lowercase(username) + ':' + password)
 
 #### Notes
 
-Currently, there is a vulnerability in the design of the first–time setup that allows anybody form the Internet to create a new user with an `admin` role. This will be fixed in the next patch version (`0.1.1`).
+Currently, there is a vulnerability in the design of the first–time setup that allows anybody from the Internet to create a new user with an `admin` role. This will be fixed in the next patch version (`0.1.1`).
 
 ## Authentication
 
