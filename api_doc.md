@@ -96,6 +96,7 @@ A session token is not required to perform this action.
 |-------|---------------------|-------------|
 | `200` | _none_              | The user was logged out successfully. |
 | `400` | A JSON error object | The session token was not provided. |
+| `401` | A JSON error object | Invalid session token. |
 
 ## Subscriptions
 
