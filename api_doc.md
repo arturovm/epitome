@@ -77,7 +77,8 @@ A session token is not required to perform this action.
 |-------|-----------------------------------------------------------------|-------------|
 | `201` | A JSON object containing a single field, called `session_token` | The user was logged in successfully. |
 | `400` | A JSON error object                                             | Username or passsword were not included in the request. |
-| `401` | A JSON error object                                             | Wrong username or password. |
+| `401` | A JSON error object                                             | Wrong password. |
+| `404` | A JSON error object                                             | A user with the provided username doesn't exist. |
 
 ### Logging Out (i.e. Deleting a Session)
 
