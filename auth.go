@@ -58,12 +58,12 @@ func PostSessions(w http.ResponseWriter, req *http.Request) {
 	var u User
 	err = DB.QueryRow("select * from users where username = ?", username).Scan(&u.Id, &u.Username, &u.DisplayName, &u.PasswordHash, &u.Role)
 	if err == sql.ErrNoRows {
-		WriteJSONError(w, http.StatusUnauthorized, "Wrong username or password.")
+		WriteJSONError(w, http.StatusUnauthorized, "Incorrect username or password.")
 		return
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password))
 	if err != nil {
-		WriteJSONError(w, http.StatusUnauthorized, "Wrong username or password.")
+		WriteJSONError(w, http.StatusUnauthorized, "Incorrect username or password.")
 		return
 	}
 	unixTimestamp := time.Now().Unix()
