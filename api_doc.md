@@ -54,7 +54,7 @@ passwordHash = MD5(lowercase(username) + ':' + password)
 
 #### Notes
 
-Currently, there is a vulnerability in the design of the first–time setup that allows anybody form the Internet to create a new user with an `admin` role. This will be fixed in the next patch version (`0.1.1`).
+Currently, there is a vulnerability in the design of the first–time setup that allows anybody from the Internet to create a new user with an `admin` role. This will be fixed in the next patch version (`0.1.1`).
 
 ## Authentication
 
@@ -96,6 +96,7 @@ A session token is not required to perform this action.
 |-------|---------------------|-------------|
 | `200` | _none_              | The user was logged out successfully. |
 | `400` | A JSON error object | The session token was not provided. |
+| `401` | A JSON error object | Invalid session token. |
 
 ## Subscriptions
 
