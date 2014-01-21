@@ -152,6 +152,11 @@ func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 		WriteJSONError(w, code, err.Error())
 		return
 	}
+	ext := req.URL.Query().Get(":ext")
+	if ext != "" && ext != ".json" && ext != ".opml" {
+		WriteJSONError(w, http.StatusNotFound, "Invalid extension")
+		return
+	}
 	global := req.FormValue("global")
 	DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
 	defer DB.Close()
