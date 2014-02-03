@@ -45,12 +45,14 @@ Because Go compiles and links all libraries statically, you can download the app
 
 To build Pond, you need the following dependencies:
 
+* moovweb/gokogiri
 * bmizerany/pat
 * mattn/go-sqlite3
 * robfig/cron
 * code.google.com/p/go.crypto/bcrypt
 
 ```bash
+go get -u github.com/moovweb/gokogiri
 go get -u github.com/bmizerany/pat
 go get -u github.com/mattn/go-sqlite3
 go get -u github.com/robfig/cron
