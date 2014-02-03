@@ -81,11 +81,25 @@ To run the Pond binary, simply do:
 ./pond
 ```
 
-To specify a port other than the default one, use the `-p` flag:
+To specify a port other than the default one, use the `--port` flag (or its shorthand `-p`):
 
 ```bash
 ./pond -p 8080
 ```
+
+To enable verbose mode (useful for debugging and development), use the `--verbose` flag:
+
+```bash
+./pond -p 8080 --verbose
+```
+
+During verbose mode, you can choose whether to log requests' bodies or not (default is off):
+
+```bash
+./pond -p 8080 --verbose --log-body
+```
+
+If verbose mode is off, this option is a no–op. Keep in mind that if you use this option during verbose mode, memory usage could increase significantly (definitely not recommended during production).
 
 ### What's Missing for 1.0?
 
