@@ -25,11 +25,11 @@ Pond is a protocol that aims to standardize Atom+RSS syncing across the web. It'
 
 Pond defines a set of RESTful HTTP API endpoints that receive and send data in a standardized format, while making it very comfortable for developers to use. Comfort, ease of use, minimalism and elegance are Pond's primary design goals.
 
-Anybody can implement Pond using their techonology stack of choice. It could be used in a multi–user environment (as is the case with the reference implementation), or a single–user environment.
+Anybody can implement Pond using their technology stack of choice. It could be used in a multi–user environment (as is the case with the reference implementation), or a single–user environment.
 
 Pond also aims to allow developers to build upon it: other protocols can be thrown on top (such as the Tent protocol), as long as the implementation satisfies all the API endpoints.
 
-All of this allows for a (hopefully) bright future: if developers were to adopt Pond in their services, maximum protability would be achieved, without all the pain that comes with learning and implementing new APIs; let alone the mess that RSS is.
+All of this allows for a (hopefully) bright future: if developers were to adopt Pond in their services, maximum portability would be achieved, without all the pain that comes with learning and implementing new APIs; let alone the mess that RSS is.
 
 ## Pond as an App
 
