@@ -4,7 +4,6 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"github.com/robfig/cron"
-	"io"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -78,10 +77,9 @@ func ReloadPreferences() error {
 func GetPreferences(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
 		log.SetOutput(os.Stdout)
-		log.Print("Received request at '/api/preferences'")
-		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		io.WriteString(os.Stdout, string(reqB))
+		log.Print("Received request at '/api/preferences'\n" + string(reqB) + "\n\n\n")
+		log.SetOutput(os.Stderr)
 	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
@@ -109,10 +107,9 @@ func GetPreferences(w http.ResponseWriter, req *http.Request) {
 func PutPreferences(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
 		log.SetOutput(os.Stdout)
-		log.Print("Received request at '/api/preferences'")
-		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		io.WriteString(os.Stdout, string(reqB))
+		log.Print("Received request at '/api/preferences'\n" + string(reqB) + "\n\n\n")
+		log.SetOutput(os.Stderr)
 	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {

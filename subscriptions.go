@@ -6,7 +6,6 @@ import (
 	"errors"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/moovweb/gokogiri"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -94,10 +93,9 @@ func findRSSTitle(rssUrl string) (string, error) {
 func PostSubscription(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
 		log.SetOutput(os.Stdout)
-		log.Print("Received request at '/api/subscriptions'")
-		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		io.WriteString(os.Stdout, string(reqB))
+		log.Print("Received request at '/api/subscriptions'\n" + string(reqB) + "\n\n\n")
+		log.SetOutput(os.Stderr)
 	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
@@ -154,10 +152,9 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
 		log.SetOutput(os.Stdout)
-		log.Print("Received request at '/api/subscriptions'")
-		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		io.WriteString(os.Stdout, string(reqB))
+		log.Print("Received request at '/api/subscriptions'\n" + string(reqB) + "\n\n\n")
+		log.SetOutput(os.Stderr)
 	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
@@ -221,10 +218,9 @@ func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 func DeleteSubscription(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
 		log.SetOutput(os.Stdout)
-		log.Print("Received request at '/api/subscriptions/:id'")
-		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		io.WriteString(os.Stdout, string(reqB))
+		log.Print("Received request at '/api/subscriptions/:id'\n" + string(reqB) + "\n\n\n")
+		log.SetOutput(os.Stderr)
 	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {

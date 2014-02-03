@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	//"encoding/json"
 	_ "github.com/mattn/go-sqlite3"
-	"io"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -32,10 +31,9 @@ type User struct {
 func PostUser(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
 		log.SetOutput(os.Stdout)
-		log.Print("Received request at '/api/users'")
-		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		io.WriteString(os.Stdout, string(reqB))
+		log.Print("Received request at '/api/users'\n" + string(reqB) + "\n\n\n")
+		log.SetOutput(os.Stderr)
 	}
 	uAuth, err, _ := GetUserForSessionToken(req.Header.Get("x-session-token"))
 	if *UserPreferences.NewUserPermissions != PublicRole && (uAuth == nil || uAuth.Role > *UserPreferences.NewUserPermissions) {

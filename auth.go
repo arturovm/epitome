@@ -46,10 +46,9 @@ func GetUserForSessionToken(token string) (*User, error, int) {
 func PostSessions(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
 		log.SetOutput(os.Stdout)
-		log.Print("Received request at '/api/auth/sessions'")
-		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		io.WriteString(os.Stdout, string(reqB))
+		log.Print("Received request at '/api/auth/sessions'\n" + string(reqB) + "\n\n\n")
+		log.SetOutput(os.Stderr)
 	}
 	username := req.PostFormValue("username")
 	password := req.PostFormValue("password")
@@ -94,10 +93,9 @@ func PostSessions(w http.ResponseWriter, req *http.Request) {
 func DeleteSessions(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
 		log.SetOutput(os.Stdout)
-		log.Print("Received request at '/api/auth/sessions/:token'")
-		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		io.WriteString(os.Stdout, string(reqB))
+		log.Print("Received request at '/api/auth/sessions/:token'\n" + string(reqB) + "\n\n\n")
+		log.SetOutput(os.Stderr)
 	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
