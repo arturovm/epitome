@@ -45,7 +45,9 @@ func GetUserForSessionToken(token string) (*User, error, int) {
 
 func PostSessions(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
+		log.SetOutput(os.Stdout)
 		log.Print("Received request at '/api/auth/sessions'")
+		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
 		io.WriteString(os.Stdout, string(reqB))
 	}
@@ -91,7 +93,9 @@ func PostSessions(w http.ResponseWriter, req *http.Request) {
 
 func DeleteSessions(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
+		log.SetOutput(os.Stdout)
 		log.Print("Received request at '/api/auth/sessions'")
+		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
 		io.WriteString(os.Stdout, string(reqB))
 	}

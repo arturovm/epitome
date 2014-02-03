@@ -77,7 +77,9 @@ func ReloadPreferences() error {
 
 func GetPreferences(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
+		log.SetOutput(os.Stdout)
 		log.Print("Received request at '/api/preferences'")
+		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
 		io.WriteString(os.Stdout, string(reqB))
 	}
@@ -106,7 +108,9 @@ func GetPreferences(w http.ResponseWriter, req *http.Request) {
 
 func PutPreferences(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
+		log.SetOutput(os.Stdout)
 		log.Print("Received request at '/api/preferences'")
+		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
 		io.WriteString(os.Stdout, string(reqB))
 	}

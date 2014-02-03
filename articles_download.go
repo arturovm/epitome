@@ -8,13 +8,16 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"sort"
 	"sync"
 	"time"
 )
 
 func UpdateArticles() {
+	log.SetOutput(os.Stdout)
 	log.Println("Updating articles")
+	log.SetOutput(os.Stderr)
 	DB, err := sql.Open("sqlite3", ExePath+"/db.db")
 	if err != nil {
 		log.Println("Article Download Error | Error opening database: " + err.Error())
@@ -56,7 +59,9 @@ func UpdateArticles() {
 		log.Println("Article Download Error | Commit error: " + err.Error())
 		return
 	}
+	log.SetOutput(os.Stdout)
 	log.Println("Finished updating articles")
+	log.SetOutput(os.Stderr)
 }
 
 func processArticles(articleChannel *chan *[]Article, tx *sql.Tx, waitGroup *sync.WaitGroup) {
@@ -208,7 +213,7 @@ func formatRSS(sub *Subscription, doc *xml.XmlDocument, articles *[]Article) {
 		}
 		// Summary
 		summaryNodes, _ := v.Search(v.Path() + "/description")
-		if len(summaryNodes[0]) > 0 {
+		if len(summaryNodes) > 0 {
 			article.Summary.Content = summaryNodes[0].Content()
 			article.Summary.Type = "html"
 		}

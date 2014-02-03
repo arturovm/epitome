@@ -75,7 +75,9 @@ func queryStringForRequest(req *http.Request, u *User, subsIds *[]string) string
 
 func GetAllArticles(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
+		log.SetOutput(os.Stdout)
 		log.Print("Received request at '/api/subscriptions/articles'")
+		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
 		io.WriteString(os.Stdout, string(reqB))
 	}
@@ -124,7 +126,9 @@ func GetAllArticles(w http.ResponseWriter, req *http.Request) {
 
 func GetArticles(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
+		log.SetOutput(os.Stdout)
 		log.Print("Received request at '/api/subscriptions/:id/articles'")
+		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
 		io.WriteString(os.Stdout, string(reqB))
 	}
@@ -169,7 +173,9 @@ func GetArticles(w http.ResponseWriter, req *http.Request) {
 
 func PutArticle(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
+		log.SetOutput(os.Stdout)
 		log.Print("Received request at '/api/subscriptions/:subid/articles/:artid'")
+		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
 		io.WriteString(os.Stdout, string(reqB))
 	}

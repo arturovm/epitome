@@ -31,7 +31,9 @@ type User struct {
 
 func PostUser(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
+		log.SetOutput(os.Stdout)
 		log.Print("Received request at '/api/users'")
+		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
 		io.WriteString(os.Stdout, string(reqB))
 	}

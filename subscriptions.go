@@ -93,7 +93,9 @@ func findRSSTitle(rssUrl string) (string, error) {
 
 func PostSubscription(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
+		log.SetOutput(os.Stdout)
 		log.Print("Received request at '/api/subscriptions'")
+		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
 		io.WriteString(os.Stdout, string(reqB))
 	}
@@ -151,7 +153,9 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 
 func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
+		log.SetOutput(os.Stdout)
 		log.Print("Received request at '/api/subscriptions'")
+		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
 		io.WriteString(os.Stdout, string(reqB))
 	}
@@ -216,7 +220,9 @@ func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 
 func DeleteSubscription(w http.ResponseWriter, req *http.Request) {
 	if verboseMode == true {
+		log.SetOutput(os.Stdout)
 		log.Print("Received request at '/api/subscriptions/:id'")
+		log.SetOutput(os.Stderr)
 		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
 		io.WriteString(os.Stdout, string(reqB))
 	}

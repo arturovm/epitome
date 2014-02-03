@@ -65,6 +65,8 @@ func main() {
 	if !strings.HasPrefix(*port, ":") {
 		*port = ":" + *port
 	}
+	log.SetOutput(os.Stdout)
 	log.Print("Starting server on port " + *port)
+	log.SetOutput(os.Stderr)
 	log.Fatal(http.ListenAndServe(*port, nil))
 }
