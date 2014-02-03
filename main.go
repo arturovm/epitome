@@ -17,6 +17,8 @@ var (
 	ExePath         string
 	CRON            *cron.Cron
 	UserPreferences *Preferences
+	verboseMode     bool
+	verboseModeBody bool
 )
 
 const (
@@ -39,8 +41,10 @@ func createTables() {
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	port := flag.String("port", "8684", "The port in which the server will listen and serve")
-	flag.StringVar(port, "p", "8684", "The port in which the server will listen and serve")
+	port := flag.String("port", "8684", "The port in which the server will listen and serve.")
+	flag.StringVar(port, "p", "8684", "The port in which the server will listen and serve.")
+	flag.BoolVar(&verboseMode, "verbose", false, "Whether to log requests coming in to the Pond server and other details.")
+	flag.BoolVar(&verboseModeBody, "log-body", false, "Whether to log the request body when verbose mode is on. If verbose mode is off, this option is a no-op. WARNING: If set to true while in verbose mode, memory usage could increase significantly.")
 	flag.Parse()
 	var err error
 	ExePath, err = filepath.EvalSymlinks(os.Args[0])
