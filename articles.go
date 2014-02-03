@@ -6,8 +6,11 @@ import (
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"html"
-	//"log"
+	"io"
+	"log"
 	"net/http"
+	"net/http/httputil"
+	"os"
 	"strings"
 	"time"
 )
@@ -71,6 +74,11 @@ func queryStringForRequest(req *http.Request, u *User, subsIds *[]string) string
 } // I AM TEH MASTAR OF SQLLLL
 
 func GetAllArticles(w http.ResponseWriter, req *http.Request) {
+	if verboseMode == true {
+		log.Print("Received request at '/api/subscriptions/articles'")
+		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
+		io.WriteString(os.Stdout, string(reqB))
+	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
 		WriteJSONError(w, http.StatusBadRequest, "Session token not provided")
@@ -115,6 +123,11 @@ func GetAllArticles(w http.ResponseWriter, req *http.Request) {
 }
 
 func GetArticles(w http.ResponseWriter, req *http.Request) {
+	if verboseMode == true {
+		log.Print("Received request at '/api/subscriptions/:id/articles'")
+		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
+		io.WriteString(os.Stdout, string(reqB))
+	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
 		WriteJSONError(w, http.StatusBadRequest, "Session token not provided")
@@ -155,6 +168,11 @@ func GetArticles(w http.ResponseWriter, req *http.Request) {
 }
 
 func PutArticle(w http.ResponseWriter, req *http.Request) {
+	if verboseMode == true {
+		log.Print("Received request at '/api/subscriptions/:subid/articles/:artid'")
+		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
+		io.WriteString(os.Stdout, string(reqB))
+	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
 		WriteJSONError(w, http.StatusBadRequest, "Session token not provided")

@@ -4,7 +4,10 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"github.com/robfig/cron"
+	"io"
+	"log"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"time"
 )
@@ -73,6 +76,11 @@ func ReloadPreferences() error {
 }
 
 func GetPreferences(w http.ResponseWriter, req *http.Request) {
+	if verboseMode == true {
+		log.Print("Received request at '/api/preferences'")
+		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
+		io.WriteString(os.Stdout, string(reqB))
+	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
 		WriteJSONError(w, http.StatusBadRequest, "Session token not provided")
@@ -97,6 +105,11 @@ func GetPreferences(w http.ResponseWriter, req *http.Request) {
 }
 
 func PutPreferences(w http.ResponseWriter, req *http.Request) {
+	if verboseMode == true {
+		log.Print("Received request at '/api/preferences'")
+		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
+		io.WriteString(os.Stdout, string(reqB))
+	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
 		WriteJSONError(w, http.StatusBadRequest, "Session token not provided")

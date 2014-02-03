@@ -5,7 +5,11 @@ import (
 	"database/sql"
 	//"encoding/json"
 	_ "github.com/mattn/go-sqlite3"
+	"io"
+	"log"
 	"net/http"
+	"net/http/httputil"
+	"os"
 	"strings"
 )
 
@@ -26,6 +30,11 @@ type User struct {
 }
 
 func PostUser(w http.ResponseWriter, req *http.Request) {
+	if verboseMode == true {
+		log.Print("Received request at '/api/users'")
+		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
+		io.WriteString(os.Stdout, string(reqB))
+	}
 	uAuth, err, _ := GetUserForSessionToken(req.Header.Get("x-session-token"))
 	if *UserPreferences.NewUserPermissions != PublicRole && (uAuth == nil || uAuth.Role > *UserPreferences.NewUserPermissions) {
 		WriteJSONError(w, http.StatusUnauthorized, "Insufficient permissions to create new accounts")
