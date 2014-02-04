@@ -126,7 +126,13 @@ When adding a subscription, if the URL is not a feed itself but rather a website
 
 ### Getting all Subscriptions
 
-#### `GET /subscriptions`
+#### `GET /subscriptions[:ext]`
+
+#### Path Components
+
+| Variable | Explanation |
+|----------|-------------|
+| `[:ext]` | When you specify an extension, the server responds with appropriately formatted data and the correct Internet Media Type. Can be one of `.json` or `.opml`. If unspecified, the server responds with JSON.
 
 #### Form Variables
 
