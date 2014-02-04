@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/moovweb/gokogiri"
@@ -17,6 +18,21 @@ type Subscription struct {
 	UserId int    `json:"-"`
 	Url    string `json:"url"`
 	Name   string `json:"name"`
+}
+
+type SubscriptionOutline struct {
+	XMLName xml.Name `xml:"outline"`
+	Type    string   `xml:"type,attr"`
+	Text    string   `xml:"text,attr"`
+	XMLUrl  string   `xml:"xmlUrl,attr"`
+	Title   string   `xml:"title,attr"`
+}
+
+type OpmlDocument struct {
+	XMLName xml.Name               `xml:"opml"`
+	Version string                 `xml:"version,attr"`
+	Title   string                 `xml:"head>title"`
+	Outline []*SubscriptionOutline `xml:"body>outline"`
 }
 
 func removeTrail(rawurl string) string {
@@ -196,13 +212,40 @@ func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 		}
 		rows.Close()
 	}
-	enc := json.NewEncoder(w)
-	w.Header().Set("content-type", "application/json")
-	encErr := enc.Encode(subs)
-	if encErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(""))
-		log.Printf("GET Subscriptions error (JSON encoding error): %s", err.Error())
+	if ext == "" || ext == ".json" {
+		enc := json.NewEncoder(w)
+		w.Header().Set("content-type", "application/json")
+		encErr := enc.Encode(subs)
+		if encErr != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(""))
+			log.Printf("GET Subscriptions error (JSON encoding error): %s", encErr.Error())
+			return
+		}
+	} else if ext == ".opml" {
+		doc := OpmlDocument{
+			Version: "2.0",
+			Title:   "Subscriptions",
+			Outline: make([]*SubscriptionOutline, len(subs)),
+		}
+		for k := range subs {
+			doc.Outline[k] = &SubscriptionOutline{
+				Type:   "rss",
+				Text:   subs[k].Name,
+				XMLUrl: subs[k].Url,
+				Title:  subs[k].Name,
+			}
+		}
+		subB, marshalErr := xml.MarshalIndent(doc, "", "\t")
+		if marshalErr != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(""))
+			log.Printf("GET subscriptions error (XML encoding error): %s", marshalErr.Error())
+			return
+		}
+		w.Header().Set("content-type", "application/xml")
+		subB = append([]byte(xml.Header), subB...)
+		w.Write(subB)
 	}
 }
 
