@@ -157,6 +157,37 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func encodeOPML(w *http.ResponseWriter, subs *[]Subscription) error {
+	doc := OpmlDocument{
+		Version: "2.0",
+		Title:   "Subscriptions",
+		Outline: make([]*SubscriptionOutline, len(*subs)),
+	}
+	for k := range *subs {
+		doc.Outline[k] = &SubscriptionOutline{
+			Type:   "rss",
+			Text:   (*subs)[k].Name,
+			XMLUrl: (*subs)[k].Url,
+			Title:  (*subs)[k].Name,
+		}
+	}
+	subB, marshalErr := xml.MarshalIndent(doc, "", "\t")
+	if marshalErr != nil {
+		return marshalErr
+	}
+	(*w).Header().Set("content-type", "application/xml")
+	subB = append([]byte(xml.Header), subB...)
+	(*w).Write(subB)
+	return nil
+}
+
+func encodeJSON(w *http.ResponseWriter, subs *[]Subscription) error {
+	enc := json.NewEncoder(*w)
+	(*w).Header().Set("content-type", "application/json")
+	encErr := enc.Encode(subs)
+	return encErr
+}
+
 func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
@@ -212,40 +243,45 @@ func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 		}
 		rows.Close()
 	}
-	if ext == "" || ext == ".json" {
-		enc := json.NewEncoder(w)
-		w.Header().Set("content-type", "application/json")
-		encErr := enc.Encode(subs)
+	if req.Header.Get("Accept") == "application/json" {
+		encErr := encodeJSON(&w, &subs)
 		if encErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(""))
 			log.Printf("GET Subscriptions error (JSON encoding error): %s", encErr.Error())
 			return
 		}
-	} else if ext == ".opml" {
-		doc := OpmlDocument{
-			Version: "2.0",
-			Title:   "Subscriptions",
-			Outline: make([]*SubscriptionOutline, len(subs)),
-		}
-		for k := range subs {
-			doc.Outline[k] = &SubscriptionOutline{
-				Type:   "rss",
-				Text:   subs[k].Name,
-				XMLUrl: subs[k].Url,
-				Title:  subs[k].Name,
-			}
-		}
-		subB, marshalErr := xml.MarshalIndent(doc, "", "\t")
-		if marshalErr != nil {
+		return
+	}
+	if req.Header.Get("Accept") == "application/xml" || req.Header.Get("Accept") == "text/xml" || req.Header.Get("Accept") == "text/x-opml" {
+		encErr := encodeOPML(&w, &subs)
+		if encErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(""))
-			log.Printf("GET subscriptions error (XML encoding error): %s", marshalErr.Error())
+			log.Printf("GET subscriptions error (XML encoding error): %s", encErr.Error())
 			return
 		}
-		w.Header().Set("content-type", "application/xml")
-		subB = append([]byte(xml.Header), subB...)
-		w.Write(subB)
+		return
+	}
+	if ext == "" || ext == ".json" {
+		encErr := encodeJSON(&w, &subs)
+		if encErr != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(""))
+			log.Printf("GET Subscriptions error (JSON encoding error): %s", encErr.Error())
+			return
+		}
+		return
+	}
+	if ext == ".opml" {
+		encErr := encodeOPML(&w, &subs)
+		if encErr != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(""))
+			log.Printf("GET subscriptions error (XML encoding error): %s", encErr.Error())
+			return
+		}
+		return
 	}
 }
 
