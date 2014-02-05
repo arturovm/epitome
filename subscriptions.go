@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type Subscription struct {
@@ -34,6 +35,12 @@ type OpmlDocument struct {
 	Title   string                 `xml:"head>title"`
 	Outline []*SubscriptionOutline `xml:"body>outline"`
 }
+
+var (
+	errSubscriptionInternalError = errors.New("An unknown error occurred.")
+	errSubscriptionNotFound      = errors.New("Could not find feed.")
+	errSubscriptionConflict      = errors.New("Feed already exists.")
+)
 
 func removeTrail(rawurl string) string {
 	if rawurl[len(rawurl)-1] == '/' {
@@ -104,6 +111,33 @@ func findRSSTitle(rssUrl string) (string, error) {
 	return "", nil
 }
 
+func processNewSub(rssUrl *string, u *User) error {
+	title, err := findRSSTitle(*rssUrl)
+	if err != nil {
+		log.Printf("POST Subscription error (Find title error): %s", err.Error())
+		return errSubscriptionInternalError
+	}
+	DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
+	defer DB.Close()
+	var sub Subscription
+	rowErr := DB.QueryRow("select * from subscriptions where url=?", rssUrl).Scan(&sub.Id, &sub.Url, &sub.Name)
+	if rowErr == nil {
+		rowErr = DB.QueryRow("select * from user_subscriptions where subscription_id=? and user_id=?", sub.Id, u.Id).Scan()
+		if rowErr == sql.ErrNoRows {
+			DB.Exec("insert into user_subscriptions values (null, ?, ?)", sub.Id, u.Id)
+			return nil
+		} else {
+			return errSubscriptionConflict
+		}
+	} else if rowErr == sql.ErrNoRows {
+		DB.Exec("insert into subscriptions values (null, ?, ?)", rssUrl, title)
+		DB.QueryRow("select id from subscriptions where url=?", rssUrl).Scan(&sub.Id)
+		DB.Exec("insert into user_subscriptions values (null, ?, ?)", sub.Id, u.Id)
+		return nil
+	}
+	return nil
+}
+
 func PostSubscription(w http.ResponseWriter, req *http.Request) {
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
@@ -115,44 +149,55 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 		WriteJSONError(w, code, err.Error())
 		return
 	}
-	if rawurl := req.FormValue("url"); rawurl != "" {
+	cTHeader := req.Header.Get("Content-Type")
+	contentTypes := strings.Split(cTHeader, ";")
+	var contentType string
+	if len(contentTypes) > 0 {
+		contentType = strings.Trim(contentTypes[0], " \t")
+	}
+	if rawurl := req.PostFormValue("url"); contentType == "application/x-www-form-urlencoded" {
+		if rawurl == "" {
+			WriteJSONError(w, http.StatusBadRequest, "Insufficient parameters: URL was not provided")
+			return
+		}
 		rssUrl, err := findRSSURL(rawurl)
 		if err != nil {
-			WriteJSONError(w, http.StatusNotFound, "Could not find feed.")
 			log.Printf("POST Subscription error (Find URL error): %s", err.Error())
+			WriteJSONError(w, http.StatusInternalServerError, errSubscriptionInternalError.Error())
 			return
-		} else {
-			title, err := findRSSTitle(rssUrl)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(""))
-				log.Printf("POST Subscription error (Find title error): %s", err.Error())
-				return
-			}
-			DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
-			defer DB.Close()
-			var sub Subscription
-			rowErr := DB.QueryRow("select * from subscriptions where url=?", rssUrl).Scan(&sub.Id, &sub.Url, &sub.Name)
-			if rowErr == nil {
-				rowErr = DB.QueryRow("select * from user_subscriptions where subscription_id=? and user_id=?", sub.Id, u.Id).Scan()
-				if rowErr == sql.ErrNoRows {
-					DB.Exec("insert into user_subscriptions values (null, ?, ?)", sub.Id, u.Id)
-					w.WriteHeader(http.StatusCreated)
-					return
-				} else {
-					WriteJSONError(w, http.StatusConflict, "Feed already exists")
-					return
-				}
-			} else if rowErr == sql.ErrNoRows {
-				DB.Exec("insert into subscriptions values (null, ?, ?)", rssUrl, title)
-				DB.QueryRow("select id from subscriptions where url=?", rssUrl).Scan(&sub.Id)
-				DB.Exec("insert into user_subscriptions values (null, ?, ?)", sub.Id, u.Id)
-				w.WriteHeader(http.StatusCreated)
-				return
-			}
 		}
+		processErr := processNewSub(&rssUrl, u)
+		status := http.StatusInternalServerError
+		if processErr == errSubscriptionNotFound {
+			status = http.StatusNotFound
+		}
+		if processErr == errSubscriptionInternalError {
+			status = http.StatusInternalServerError
+		}
+		if processErr == errSubscriptionConflict {
+			status = http.StatusConflict
+		}
+		if processErr != nil {
+			WriteJSONError(w, status, processErr.Error())
+			return
+		}
+		w.WriteHeader(http.StatusCreated)
+		return
+	} else if contentType == "application/xml" || contentType == "text/xml" || contentType == "text/x-opml" {
+		dec := xml.NewDecoder(req.Body)
+		var doc OpmlDocument
+		decErr := dec.Decode(&doc)
+		if decErr != nil {
+			WriteJSONError(w, http.StatusBadRequest, "Malformed OPML received")
+			return
+		}
+		for k, _ := range doc.Outline {
+			processNewSub(&(doc.Outline[k].XMLUrl), u)
+		}
+		w.WriteHeader(http.StatusCreated)
+		return
 	} else {
-		WriteJSONError(w, http.StatusBadRequest, "Insufficient parameters: URL was not provided")
+		WriteJSONError(w, http.StatusBadRequest, "No acceptable Content-Type was provided")
 		return
 	}
 }
