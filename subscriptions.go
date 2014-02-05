@@ -149,13 +149,8 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 		WriteJSONError(w, code, err.Error())
 		return
 	}
-	cTHeader := req.Header.Get("Content-Type")
-	contentTypes := strings.Split(cTHeader, ";")
-	var contentType string
-	if len(contentTypes) > 0 {
-		contentType = strings.Trim(contentTypes[0], " \t")
-	}
-	if rawurl := req.PostFormValue("url"); contentType == "application/x-www-form-urlencoded" {
+	contentType := &req.Header.Get("Content-Type")
+	if rawurl := req.PostFormValue("url"); TestContentType(contentType, "application/x-www-form-urlencoded") {
 		if rawurl == "" {
 			WriteJSONError(w, http.StatusBadRequest, "Insufficient parameters: URL was not provided")
 			return
@@ -183,7 +178,7 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 		}
 		w.WriteHeader(http.StatusCreated)
 		return
-	} else if contentType == "application/xml" || contentType == "text/xml" || contentType == "text/x-opml" {
+	} else if TestContentType(contentType, "application/xml") || TestContentType(contentType, "text/xml") || TestContentType(contentType, "text/x-opml") {
 		dec := xml.NewDecoder(req.Body)
 		var doc OpmlDocument
 		decErr := dec.Decode(&doc)
