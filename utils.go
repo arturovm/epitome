@@ -11,10 +11,10 @@ func WriteJSONError(w http.ResponseWriter, status int, errorMessage string) {
 	w.Write([]byte(`{"error": "` + errorMessage + `"}`))
 }
 
-func TestContentType(rawHeader, target *string) bool {
+func TestContentType(rawHeader *string, target string) bool {
 	parts := strings.Split(*rawHeader, ";")
 	if len(parts) > 0 {
-		return strings.Trim(parts[0], " \t") == *target
+		return strings.Trim(parts[0], " \t") == target
 	}
 	return false
 }
