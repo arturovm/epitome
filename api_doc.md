@@ -154,6 +154,8 @@ The preferred method is to use the `Accept` header, but the other method is avai
 
 ##### Requesting Data in the OPML Format
 
+Do one of the following:
+
 * Set the `Accept` header to any of the valid OPML Internet Media Types (`application/xml`, `text/xml`, `text/x-opml`). The preferred type is `application/xml`; the other types are available to provide flexibility.
 * Append `.opml` to the `/subscriptions` API endpoint (e.g. `/subscriptions.opml`)
 
