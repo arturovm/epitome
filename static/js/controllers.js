@@ -1,4 +1,4 @@
-function SubscriptionsController($scope, $http, $cookieStore, $location) {
+function SubscriptionsController($scope, $document, $http, $cookieStore, $location) {
 	$http.get('/api/subscriptions', {
 		headers: {
 			'X-Session-Token': $cookieStore.get('user').session_token
@@ -38,6 +38,34 @@ function SubscriptionsController($scope, $http, $cookieStore, $location) {
 			});
 		});
 	};
+	/*$scope.submitFile = function() {
+		var payload = new FormData();
+		payload.append("subscriptions", document.getElementById("subs-file").files[0]);
+		$http.post('/api/subscriptions', payload, {
+			headers: {
+				'Content-Type': undefined,
+				'X-Session-Token': $cookieStore.get('user').session_token
+			},
+			transformRequest: function(data) {
+				return data
+			}
+		}).error(function(data) {
+			if (angular.isObject(data) == true && data.error != undefined) {
+				alertify.error("Error uploading file: " + data.error);
+			}
+		}).success(function(data) {
+			alertify.success("Feeds added");
+			$http.get('/api/subscriptions', {
+				headers: {
+					'x-session-token': $cookieStore.get('user').session_token
+				}
+			}).error(function(data) {
+				alertify.error("Error updating feeds");
+			}).success(function(data) {
+				$scope.subs = data;
+			});
+		});
+	};*/
 	$scope.delete = function(id) {
 		$http.delete('/api/subscriptions/' + id, {
 			headers: {
