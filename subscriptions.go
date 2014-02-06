@@ -11,7 +11,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 type Subscription struct {
@@ -22,11 +21,12 @@ type Subscription struct {
 }
 
 type SubscriptionOutline struct {
-	XMLName xml.Name `xml:"outline"`
-	Type    string   `xml:"type,attr"`
-	Text    string   `xml:"text,attr"`
-	XMLUrl  string   `xml:"xmlUrl,attr"`
-	Title   string   `xml:"title,attr"`
+	XMLName xml.Name               `xml:"outline"`
+	Type    string                 `xml:"type,attr"`
+	Text    string                 `xml:"text,attr"`
+	XMLUrl  string                 `xml:"xmlUrl,attr"`
+	Title   string                 `xml:"title,attr"`
+	Outline []*SubscriptionOutline `xml:"outline"`
 }
 
 type OpmlDocument struct {
@@ -111,12 +111,7 @@ func findRSSTitle(rssUrl string) (string, error) {
 	return "", nil
 }
 
-func processNewSub(rssUrl *string, u *User) error {
-	title, err := findRSSTitle(*rssUrl)
-	if err != nil {
-		log.Printf("POST Subscription error (Find title error): %s", err.Error())
-		return errSubscriptionInternalError
-	}
+func processNewSub(rssUrl, title *string, u *User) error {
 	DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
 	defer DB.Close()
 	var sub Subscription
@@ -138,6 +133,92 @@ func processNewSub(rssUrl *string, u *User) error {
 	return nil
 }
 
+func processOutline(outline []*SubscriptionOutline, u *User) {
+	if len(outline) > 0 {
+		for k, _ := range outline {
+			if len(outline[k].Outline) > 0 {
+				processOutline(outline[k].Outline, u)
+			} else {
+				processNewSub(&(outline[k].XMLUrl), &(outline[k].Text), u)
+			}
+		}
+	}
+}
+
+func getProcessFunc(contentType, rawurl string, u *User, w http.ResponseWriter, req *http.Request) func() {
+	if TestContentType(&contentType, "application/x-www-form-urlencoded") {
+		return func() {
+			if rawurl == "" {
+				WriteJSONError(w, http.StatusBadRequest, "Insufficient parameters: URL was not provided")
+				return
+			}
+			rssUrl, err := findRSSURL(rawurl)
+			if err != nil {
+				log.Printf("POST Subscription error (Find URL error): %s", err.Error())
+				WriteJSONError(w, http.StatusInternalServerError, errSubscriptionInternalError.Error())
+				return
+			}
+			title, err := findRSSTitle(rssUrl)
+			if err != nil {
+				log.Printf("POST Subscription error (Find title error): %s", err.Error())
+				WriteJSONError(w, http.StatusInternalServerError, "An unknown error occurred.")
+				return
+			}
+			processErr := processNewSub(&rssUrl, &title, u)
+			status := http.StatusInternalServerError
+			if processErr == errSubscriptionNotFound {
+				status = http.StatusNotFound
+			}
+			if processErr == errSubscriptionInternalError {
+				status = http.StatusInternalServerError
+			}
+			if processErr == errSubscriptionConflict {
+				status = http.StatusConflict
+			}
+			if processErr != nil {
+				WriteJSONError(w, status, processErr.Error())
+				return
+			}
+			w.WriteHeader(http.StatusCreated)
+			return
+		}
+	} else if TestContentType(&contentType, "application/xml") || TestContentType(&contentType, "text/xml") || TestContentType(&contentType, "text/x-opml") {
+		return func() {
+			dec := xml.NewDecoder(req.Body)
+			var doc OpmlDocument
+			decErr := dec.Decode(&doc)
+			if decErr != nil {
+				WriteJSONError(w, http.StatusBadRequest, "Malformed OPML received")
+				return
+			}
+			processOutline(doc.Outline, u)
+			w.WriteHeader(http.StatusCreated)
+			return
+		}
+	} else if TestContentType(&contentType, "multipart/form-data") {
+		return func() {
+			subsFile, _, err := req.FormFile("subscriptions")
+			if err != nil {
+				WriteJSONError(w, http.StatusInternalServerError, "An error occurred while processing your file.")
+				return
+			}
+			b, _ := ioutil.ReadAll(subsFile)
+			defer subsFile.Close()
+			var doc OpmlDocument
+			xml.Unmarshal(b, &doc)
+			processOutline(doc.Outline, u)
+			w.WriteHeader(http.StatusCreated)
+			return
+		}
+	} else {
+		return func() {
+			w.Header().Set("Accept", "application/x-www-form-urlencoded, application/xml, multipart/form-data")
+			WriteJSONError(w, http.StatusBadRequest, "No acceptable Content-Type was provided")
+			return
+		}
+	}
+}
+
 func PostSubscription(w http.ResponseWriter, req *http.Request) {
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
@@ -149,52 +230,10 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 		WriteJSONError(w, code, err.Error())
 		return
 	}
-	contentType := &req.Header.Get("Content-Type")
-	if rawurl := req.PostFormValue("url"); TestContentType(contentType, "application/x-www-form-urlencoded") {
-		if rawurl == "" {
-			WriteJSONError(w, http.StatusBadRequest, "Insufficient parameters: URL was not provided")
-			return
-		}
-		rssUrl, err := findRSSURL(rawurl)
-		if err != nil {
-			log.Printf("POST Subscription error (Find URL error): %s", err.Error())
-			WriteJSONError(w, http.StatusInternalServerError, errSubscriptionInternalError.Error())
-			return
-		}
-		processErr := processNewSub(&rssUrl, u)
-		status := http.StatusInternalServerError
-		if processErr == errSubscriptionNotFound {
-			status = http.StatusNotFound
-		}
-		if processErr == errSubscriptionInternalError {
-			status = http.StatusInternalServerError
-		}
-		if processErr == errSubscriptionConflict {
-			status = http.StatusConflict
-		}
-		if processErr != nil {
-			WriteJSONError(w, status, processErr.Error())
-			return
-		}
-		w.WriteHeader(http.StatusCreated)
-		return
-	} else if TestContentType(contentType, "application/xml") || TestContentType(contentType, "text/xml") || TestContentType(contentType, "text/x-opml") {
-		dec := xml.NewDecoder(req.Body)
-		var doc OpmlDocument
-		decErr := dec.Decode(&doc)
-		if decErr != nil {
-			WriteJSONError(w, http.StatusBadRequest, "Malformed OPML received")
-			return
-		}
-		for k, _ := range doc.Outline {
-			processNewSub(&(doc.Outline[k].XMLUrl), u)
-		}
-		w.WriteHeader(http.StatusCreated)
-		return
-	} else {
-		WriteJSONError(w, http.StatusBadRequest, "No acceptable Content-Type was provided")
-		return
-	}
+	rawUrl := req.PostFormValue("url")
+	contentType := req.Header.Get("Content-Type")
+	getProcessFunc(contentType, rawUrl, u, w, req)()
+	return
 }
 
 func encodeOPML(w *http.ResponseWriter, subs *[]Subscription) error {
