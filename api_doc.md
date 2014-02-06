@@ -103,17 +103,30 @@ To avoid data redundancy, Pond keeps two tables: one which stores server–wide 
 
 You can delete server–wide subscriptions by setting the `global` query parameter to `true`, when [unsubscribing from a feed](#unsubscribing-from-a-feed). Be _very_ careful when doing this; it affects _all_ users subscribed to that feed.
 
-### Subscribing to a Feed
+### Subscribing to Feeds
 
-When adding a subscription, if the URL is not a feed itself but rather a website, the server attempts to perform automatic discovery of the RSS or Atom feed, via the `<link>` HTML tags.
+#### Posting Data in Various Formats
+
+You have at your disposal three options for adding subscriptions to the server, specifying the relevant Internet Media Type in the `Content-Type` header of your request:
+
+* You can post single subscriptions, with the `application/x-www-form-urlencoded` Internet Media Type
+* You can import OPML subscriptions by uploading a valid XML file, by performing a `multipart/form-data` request
+* You can import OPML subscriptions by uploading the actual XML in the request body, with any of the valid OPML Internet Media Types (`application/xml`, `text/xml`, `text/x-opml`). The preferred type is `application/xml`; the other types are available to provide flexibility.
+
+##### Important Notes
+
+If uploading a file, make sure your `Content-Type` header correctly specifies a `boundary`. Most clients and/or libraries do this automatically for you.
+
+When posting a subscription with the `application/x-www-form-urlencoded` Internet Media Type, if the URL is not a feed itself but rather a website, the server attempts to perform automatic discovery of the RSS or Atom feed, via the `<link>` HTML tags.
 
 #### `POST /subscriptions`
 
 #### Form Variables
 
-| Variable | Value  | Required | Default | Explanation |
-|----------|--------|----------|---------|-------------|
-| `url`    | string | __Yes__  | _none_  | This could be an Atom or RSS feed URL, or the URL of a website. |
+| Variable        | Value  | Required | Default | Explanation |
+|-----------------|--------|----------|---------|-------------|
+| `url`           | string | No       | _none_  | This could be an Atom or RSS feed URL, or the URL of a website. Used only when posting single subscriptions. |
+| `subscriptions` | string | No       | _none_  | This is the form key used to identify your file when performing a multipart request. 
 
 #### Response
 
@@ -125,6 +138,26 @@ When adding a subscription, if the URL is not a feed itself but rather a website
 | `409` | A JSON error object | The user is already subscribed to that feed. |
 
 ### Getting all Subscriptions
+
+#### Requesting Data in Various Formats
+
+You have at your disposal two formats and two options for requesting data from the server. You can either add the relevant path extension to the request path, or specify what kind of content you want in the `Accept` header. If none of these methods is used, and no data format is specified, the server defaults to returning JSON.
+
+##### Requesting Data in the JSON Format
+
+Do one of the following:
+
+* Set the `Accept` header to the `application/json` Internet Media Type.
+* Append `.json` to the `/subscriptions` API endpoint (e.g. `/subscriptions.json`)
+
+The preferred method is to use the `Accept` header, but the other method is available to provide flexibility and ease of use.
+
+##### Requesting Data in the OPML Format
+
+* Set the `Accept` header to any of the valid OPML Internet Media Types (`application/xml`, `text/xml`, `text/x-opml`). The preferred type is `application/xml`; the other types are available to provide flexibility.
+* Append `.opml` to the `/subscriptions` API endpoint (e.g. `/subscriptions.opml`)
+
+The preferred method is to use the `Accept` header, but the other method is available to provide flexibility and ease of use.
 
 #### `GET /subscriptions[:ext]`
 
@@ -146,7 +179,7 @@ When adding a subscription, if the URL is not a feed itself but rather a website
 |-------|---------------------------------------------------------------------------------|-------------|
 | `200` | A possibly empty JSON array of [Subscription objects](#the-subscription-object) | Returns a list of the user's subscriptions. |
 | `400` | A JSON error object                                                             | The session token was not provided. |
-| `401` | A JSON error object                                                             | If `global` was set to `true`, this might mean the user doesn't have enough privileges to view global subsciptions. |
+| `401` | A JSON error object                                                             | If `global` was set to `true`, this might mean the user doesn't have enough privileges to view global subscriptions. |
 
 ### Unsubscribing from a Feed
 
