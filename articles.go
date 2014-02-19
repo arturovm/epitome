@@ -113,8 +113,6 @@ func GetAllArticles(w http.ResponseWriter, req *http.Request) {
 		var dateString string
 		rows.Scan(&article.Id, &article.SubscriptionId, &article.Url, &article.Title, &article.Author, &dateString, &article.Body.Content, &article.Body.Type, &article.Summary.Content, &article.Summary.Type, &article.Read)
 		article.Published, err = time.Parse("2006-01-02 15:04:05", dateString)
-		article.Body.Content = html.EscapeString(article.Body.Content)
-		article.Summary.Content = html.EscapeString(article.Summary.Content)
 		articles = append(articles, article)
 	}
 	enc := json.NewEncoder(w)
@@ -159,8 +157,6 @@ func GetArticles(w http.ResponseWriter, req *http.Request) {
 		var dateString string
 		rows.Scan(&article.Id, &article.SubscriptionId, &article.Url, &article.Title, &article.Author, &dateString, &article.Body.Content, &article.Body.Type, &article.Summary.Content, &article.Summary.Type, &article.Read)
 		article.Published, err = time.Parse("2006-01-02 15:04:05", dateString)
-		article.Body.Content = html.EscapeString(article.Body.Content)
-		article.Summary.Content = html.EscapeString(article.Summary.Content)
 		articles = append(articles, article)
 	}
 	enc := json.NewEncoder(w)
