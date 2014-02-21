@@ -8,9 +8,7 @@ import (
 	"errors"
 	_ "github.com/mattn/go-sqlite3"
 	"io"
-	"log"
 	"net/http"
-	"net/http/httputil"
 	"os"
 	"strconv"
 	"strings"
@@ -44,15 +42,20 @@ func GetUserForSessionToken(token string) (*User, error, int) {
 }
 
 func PostSessions(w http.ResponseWriter, req *http.Request) {
+	var vMap map[string]string
 	if verboseMode == true {
-		log.SetOutput(os.Stdout)
-		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		log.Print("Received request at '/api/auth/sessions'\n" + string(reqB) + "\n\n\n")
-		log.SetOutput(os.Stderr)
+		vMap = make(map[string]string)
+		LogRequest(req, "/api/auth/sessions")
 	}
 	username := req.PostFormValue("username")
 	password := req.PostFormValue("password")
 	appName := req.PostFormValue("appname")
+	if verboseMode == true {
+		vMap["Username"] = username
+		vMap["Password"] = password
+		vMap["App name"] = appName
+		LogParsedValues(vMap, os.Stdout)
+	}
 	if username == "" || password == "" {
 		WriteJSONError(w, http.StatusBadRequest, "Not enough parameters to log in")
 		return
@@ -91,13 +94,16 @@ func PostSessions(w http.ResponseWriter, req *http.Request) {
 }
 
 func DeleteSessions(w http.ResponseWriter, req *http.Request) {
+	var vMap map[string]string
 	if verboseMode == true {
-		log.SetOutput(os.Stdout)
-		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		log.Print("Received request at '/api/auth/sessions/:token'\n" + string(reqB) + "\n\n\n")
-		log.SetOutput(os.Stderr)
+		vMap = make(map[string]string)
+		LogRequest(req, "/api/auth/sessions/:token")
 	}
 	sessionToken := req.Header.Get("x-session-token")
+	if verboseMode == true {
+		vMap["Session token"] = sessionToken
+		LogParsedValues(vMap, os.Stdout)
+	}
 	if sessionToken == "" {
 		WriteJSONError(w, http.StatusBadRequest, "Session token not provided")
 		return

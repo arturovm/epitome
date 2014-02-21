@@ -6,9 +6,7 @@ import (
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"html"
-	"log"
 	"net/http"
-	"net/http/httputil"
 	"os"
 	"strings"
 	"time"
@@ -73,11 +71,10 @@ func queryStringForRequest(req *http.Request, u *User, subsIds *[]string) string
 } // I AM TEH MASTAR OF SQLLLL
 
 func GetAllArticles(w http.ResponseWriter, req *http.Request) {
+	var vMap map[string]string
 	if verboseMode == true {
-		log.SetOutput(os.Stdout)
-		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		log.Print("Received request at '/api/subscriptions/articles'\n" + string(reqB) + "\n\n\n")
-		log.SetOutput(os.Stderr)
+		vMap = make(map[string]string)
+		LogRequest(req, "/api/subscriptions/articles")
 	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
@@ -88,6 +85,15 @@ func GetAllArticles(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		WriteJSONError(w, code, err.Error())
 		return
+	}
+	if verboseMode == true {
+		vMap["Session token"] = sessionToken
+		vMap["Status"] = req.FormValue("status")
+		vMap["Order"] = req.FormValue("order")
+		vMap["Limit"] = req.FormValue("limit")
+		vMap["Since ID"] = req.FormValue("since_id")
+		vMap["Before ID"] = req.FormValue("before_id")
+		LogParsedValues(vMap, os.Stdout)
 	}
 	DB, err := sql.Open("sqlite3", ExePath+"/db.db")
 	if err != nil {
@@ -123,11 +129,10 @@ func GetAllArticles(w http.ResponseWriter, req *http.Request) {
 }
 
 func GetArticles(w http.ResponseWriter, req *http.Request) {
+	var vMap map[string]string
 	if verboseMode == true {
-		log.SetOutput(os.Stdout)
-		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		log.Print("Received request at '/api/subscriptions/:id/articles'\n" + string(reqB) + "\n\n\n")
-		log.SetOutput(os.Stderr)
+		vMap = make(map[string]string)
+		LogRequest(req, "/api/subscriptions/:id/articles")
 	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
@@ -140,6 +145,16 @@ func GetArticles(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	subId := req.URL.Query().Get(":id")
+	if verboseMode == true {
+		vMap["Session token"] = sessionToken
+		vMap["ID"] = subId
+		vMap["Status"] = req.FormValue("status")
+		vMap["Order"] = req.FormValue("order")
+		vMap["Limit"] = req.FormValue("limit")
+		vMap["Since ID"] = req.FormValue("since_id")
+		vMap["Before ID"] = req.FormValue("before_id")
+		LogParsedValues(vMap, os.Stdout)
+	}
 	DB, err := sql.Open("sqlite3", ExePath+"/db.db")
 	if err != nil {
 		WriteJSONError(w, http.StatusInternalServerError, "Couldn't connect to database")
@@ -169,11 +184,10 @@ func GetArticles(w http.ResponseWriter, req *http.Request) {
 }
 
 func PutArticle(w http.ResponseWriter, req *http.Request) {
+	var vMap map[string]string
 	if verboseMode == true {
-		log.SetOutput(os.Stdout)
-		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		log.Print("Received request at '/api/subscriptions/:subid/articles/:artid'\n" + string(reqB) + "\n\n\n")
-		log.SetOutput(os.Stderr)
+		vMap = make(map[string]string)
+		LogRequest(req, "api/subscriptions/:subid/articles/:artid")
 	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
@@ -188,6 +202,12 @@ func PutArticle(w http.ResponseWriter, req *http.Request) {
 	subId := req.URL.Query().Get(":subid")
 	artId := req.URL.Query().Get(":artid")
 	status := req.FormValue("status")
+	if verboseMode == true {
+		vMap["Session token"] = sessionToken
+		vMap["Subscription ID"] = subId
+		vMap["Article ID"] = artId
+		LogParsedValues(vMap, os.Stdout)
+	}
 	DB, err := sql.Open("sqlite3", ExePath+"/db.db")
 	if err != nil {
 		WriteJSONError(w, http.StatusInternalServerError, "Couldn't connect to database")

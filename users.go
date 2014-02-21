@@ -5,9 +5,7 @@ import (
 	"database/sql"
 	//"encoding/json"
 	_ "github.com/mattn/go-sqlite3"
-	"log"
 	"net/http"
-	"net/http/httputil"
 	"os"
 	"strings"
 )
@@ -29,11 +27,10 @@ type User struct {
 }
 
 func PostUser(w http.ResponseWriter, req *http.Request) {
+	var vMap map[string]string
 	if verboseMode == true {
-		log.SetOutput(os.Stdout)
-		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		log.Print("Received request at '/api/users'\n" + string(reqB) + "\n\n\n")
-		log.SetOutput(os.Stderr)
+		vMap = make(map[string]string)
+		LogRequest(req, "/api/users")
 	}
 	uAuth, err, _ := GetUserForSessionToken(req.Header.Get("x-session-token"))
 	if *UserPreferences.NewUserPermissions != PublicRole && (uAuth == nil || uAuth.Role > *UserPreferences.NewUserPermissions) {
@@ -47,6 +44,12 @@ func PostUser(w http.ResponseWriter, req *http.Request) {
 	}
 	username := req.FormValue("username")
 	password := req.FormValue("password")
+	if verboseMode == true {
+		vMap["Username"] = username
+		vMap["Password"] = password
+		vMap["Role"] = req.FormValue("role")
+		LogParsedValues(vMap, os.Stdout)
+	}
 	if username == "" || password == "" {
 		WriteJSONError(w, http.StatusBadRequest, "Insufficient parameters")
 		return
