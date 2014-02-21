@@ -4,10 +4,9 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"github.com/robfig/cron"
-	"log"
 	"net/http"
-	"net/http/httputil"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -75,16 +74,19 @@ func ReloadPreferences() error {
 }
 
 func GetPreferences(w http.ResponseWriter, req *http.Request) {
+	var vMap map[string]string
 	if verboseMode == true {
-		log.SetOutput(os.Stdout)
-		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		log.Print("Received request at '/api/preferences'\n" + string(reqB) + "\n\n\n")
-		log.SetOutput(os.Stderr)
+		vMap = make(map[string]string)
+		LogRequest(req, "/api/preferences")
 	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
 		WriteJSONError(w, http.StatusBadRequest, "Session token not provided")
 		return
+	}
+	if verboseMode == true {
+		vMap["Session token"] = sessionToken
+		LogParsedValues(vMap, os.Stdout)
 	}
 	u, err, code := GetUserForSessionToken(sessionToken)
 	if err != nil {
@@ -105,11 +107,10 @@ func GetPreferences(w http.ResponseWriter, req *http.Request) {
 }
 
 func PutPreferences(w http.ResponseWriter, req *http.Request) {
+	var vMap map[string]string
 	if verboseMode == true {
-		log.SetOutput(os.Stdout)
-		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		log.Print("Received request at '/api/preferences'\n" + string(reqB) + "\n\n\n")
-		log.SetOutput(os.Stderr)
+		vMap = make(map[string]string)
+		LogRequest(req, "/api/preferences")
 	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
@@ -129,6 +130,12 @@ func PutPreferences(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		WriteJSONError(w, http.StatusBadRequest, "Malformed JSON")
 		return
+	}
+	if verboseMode == true {
+		vMap["Session token"] = sessionToken
+		vMap["Refresh rate"] = *prefs.RefreshRate
+		vMap["New user permissions"] = strconv.Itoa(int(*prefs.NewUserPermissions))
+		LogParsedValues(vMap, os.Stdout)
 	}
 	if prefs.NewUserPermissions == nil && prefs.RefreshRate == nil {
 		WriteJSONError(w, http.StatusBadRequest, "You must provide at least one valid field")

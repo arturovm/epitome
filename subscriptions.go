@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"os"
 )
@@ -222,11 +221,10 @@ func getProcessFunc(contentType, rawurl string, u *User, w http.ResponseWriter, 
 }
 
 func PostSubscription(w http.ResponseWriter, req *http.Request) {
+	var vMap map[string]string
 	if verboseMode == true {
-		log.SetOutput(os.Stdout)
-		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		log.Print("Received request at '/api/subscriptions'\n" + string(reqB) + "\n\n\n")
-		log.SetOutput(os.Stderr)
+		vMap = make(map[string]string)
+		LogRequest(req, "/api/subscriptions")
 	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
@@ -239,6 +237,11 @@ func PostSubscription(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	rawUrl := req.PostFormValue("url")
+	if verboseMode == true {
+		vMap["Session token"] = sessionToken
+		vMap["URL"] = req.FormValue("url")
+		LogParsedValues(vMap, os.Stdout)
+	}
 	contentType := req.Header.Get("Content-Type")
 	getProcessFunc(contentType, rawUrl, u, w, req)()
 	return
@@ -276,11 +279,10 @@ func encodeJSON(w *http.ResponseWriter, subs *[]Subscription) error {
 }
 
 func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
+	var vMap map[string]string
 	if verboseMode == true {
-		log.SetOutput(os.Stdout)
-		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		log.Print("Received request at '/api/subscriptions'\n" + string(reqB) + "\n\n\n")
-		log.SetOutput(os.Stderr)
+		vMap = make(map[string]string)
+		LogRequest(req, "/api/subscriptions")
 	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
@@ -298,6 +300,11 @@ func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	global := req.FormValue("global")
+	if verboseMode == true {
+		vMap["Session token"] = sessionToken
+		vMap["Global"] = global
+		LogParsedValues(vMap, os.Stdout)
+	}
 	DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
 	defer DB.Close()
 
@@ -379,11 +386,10 @@ func GetSubscriptions(w http.ResponseWriter, req *http.Request) {
 }
 
 func DeleteSubscription(w http.ResponseWriter, req *http.Request) {
+	var vMap map[string]string
 	if verboseMode == true {
-		log.SetOutput(os.Stdout)
-		reqB, _ := httputil.DumpRequest(req, verboseModeBody)
-		log.Print("Received request at '/api/subscriptions/:id'\n" + string(reqB) + "\n\n\n")
-		log.SetOutput(os.Stderr)
+		vMap = make(map[string]string)
+		LogRequest(req, "/api/subscriptions/:id")
 	}
 	sessionToken := req.Header.Get("x-session-token")
 	if sessionToken == "" {
@@ -397,6 +403,12 @@ func DeleteSubscription(w http.ResponseWriter, req *http.Request) {
 	}
 	id := req.URL.Query().Get(":id")
 	global := req.FormValue("global")
+	if verboseMode == true {
+		vMap["Session token"] = sessionToken
+		vMap["Subscription ID"] = id
+		vMap["Global"] = global
+		LogParsedValues(vMap, os.Stdout)
+	}
 	DB, _ := sql.Open("sqlite3", ExePath+"/db.db")
 	defer DB.Close()
 	var dummy int
