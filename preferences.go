@@ -131,15 +131,23 @@ func PutPreferences(w http.ResponseWriter, req *http.Request) {
 		WriteJSONError(w, http.StatusBadRequest, "Malformed JSON")
 		return
 	}
-	if verboseMode == true {
-		vMap["Session token"] = sessionToken
-		vMap["Refresh rate"] = *prefs.RefreshRate
-		vMap["New user permissions"] = strconv.Itoa(int(*prefs.NewUserPermissions))
-		LogParsedValues(vMap, os.Stdout)
-	}
 	if prefs.NewUserPermissions == nil && prefs.RefreshRate == nil {
 		WriteJSONError(w, http.StatusBadRequest, "You must provide at least one valid field")
 		return
+	}
+	if verboseMode == true {
+		vMap["Session token"] = sessionToken
+		RR := ""
+		if prefs.RefreshRate != nil {
+			RR = *prefs.RefreshRate
+		}
+		vMap["Refresh rate"] = RR
+		NUP := ""
+		if prefs.NewUserPermissions != nil {
+			NUP = strconv.Itoa(int(*prefs.NewUserPermissions))
+		}
+		vMap["New user permissions"] = NUP
+		LogParsedValues(vMap, os.Stdout)
 	}
 	currentPrefs, err := readPreferences()
 	if err != nil {
