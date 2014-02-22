@@ -5,6 +5,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/moovweb/gokogiri"
 	"github.com/moovweb/gokogiri/xml"
+	"html"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -152,7 +153,9 @@ func formatAtom(sub *Subscription, doc *xml.XmlDocument, articles *[]Article) {
 		article.Title = titleNodes[0].Content()
 		// Link
 		linkNodes, _ := v.Search(v.Path() + "/link")
-		article.Url = linkNodes[0].Attr("href")
+		if len(linkNodes) > 0 {
+			article.Url = linkNodes[0].Attr("href")
+		}
 		// Published
 		dateNodes, _ := v.Search(v.Path() + "/published")
 		pub, _ := time.Parse(time.RFC3339, dateNodes[0].Content())
@@ -171,7 +174,7 @@ func formatAtom(sub *Subscription, doc *xml.XmlDocument, articles *[]Article) {
 		// Body
 		bodyNodes, _ := v.Search(v.Path() + "/content")
 		if len(bodyNodes) > 0 {
-			article.Body.Content = bodyNodes[0].Content()
+			article.Body.Content = html.UnescapeString(bodyNodes[0].InnerHtml())
 			article.Body.Type = bodyNodes[0].Attr("type")
 		}
 		// Read
@@ -198,7 +201,9 @@ func formatRSS(sub *Subscription, doc *xml.XmlDocument, articles *[]Article) {
 		article.Title = titleNodes[0].Content()
 		// Link
 		linkNodes, _ := v.Search(v.Path() + "/link")
-		article.Url = linkNodes[0].Content()
+		if len(linkNodes) > 0 {
+			article.Url = linkNodes[0].Content()
+		}
 		// Published
 		dateNodes, _ := v.Search(v.Path() + "/pubDate")
 		pub, err := time.Parse(time.RFC1123Z, dateNodes[0].Content())
@@ -214,7 +219,7 @@ func formatRSS(sub *Subscription, doc *xml.XmlDocument, articles *[]Article) {
 		// Summary
 		summaryNodes, _ := v.Search(v.Path() + "/description")
 		if len(summaryNodes) > 0 {
-			article.Summary.Content = summaryNodes[0].Content()
+			article.Summary.Content = html.UnescapeString(summaryNodes[0].InnerHtml())
 			article.Summary.Type = "html"
 		}
 		// Body
