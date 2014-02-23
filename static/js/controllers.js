@@ -3,8 +3,12 @@ function SubscriptionsController($scope, $document, $http, $cookieStore, $locati
 		headers: {
 			'X-Session-Token': $cookieStore.get('user').session_token
 		}
-	}).error(function(data) {
+	}).error(function(data, status) {
 		alertify.error("Error updating feeds");
+		if (status == 401) {
+			$cookieStore.remove('user');
+			$location.path('/login');
+		}
 	}).success(function(data) {
 		$scope.subs = data;
 	});
@@ -20,9 +24,13 @@ function SubscriptionsController($scope, $document, $http, $cookieStore, $locati
 				'Content-Type': 'application/x-www-form-urlencoded',
 				'X-Session-Token': $cookieStore.get('user').session_token
 			}
-		}).error(function(data) {
+		}).error(function(data status) {
 			if (angular.isObject(data) == true && data.error != undefined) {
 				alertify.error("Error creating feed: " + data.error);
+			}
+			if (status == 401) {
+				$cookieStore.remove('user');
+				$location.path('/login');
 			}
 		}).success(function(data) {
 			$scope.url = "";
@@ -71,9 +79,13 @@ function SubscriptionsController($scope, $document, $http, $cookieStore, $locati
 			headers: {
 				'X-Session-Token': $cookieStore.get('user').session_token
 			}
-		}).error(function(data) {
+		}).error(function(data, status) {
 			if (angular.isObject(data) == true && data.error != undefined) {
 				alertify.error("Error deleting feed: " + data.error);
+			}
+			if (status == 401) {
+				$cookieStore.remove('user');
+				$location.path('/login');
 			}
 		}).success(function(data) {
 			alertify.success("Feed deleted");
@@ -93,9 +105,13 @@ function SubscriptionsController($scope, $document, $http, $cookieStore, $locati
 			headers: {
 				'X-Session-Token': $cookieStore.get('user').session_token
 			}
-		}).error(function(data) {
+		}).error(function(data, status) {
 			if (angular.isObject(data) == true && data.error != undefined) {
 				alertify.error("Error logging you out: " + data.error);
+			}
+			if (status == 401) {
+				$cookieStore.remove('user');
+				$location.path('/login');
 			}
 		}).success(function(data) {
 			$cookieStore.remove('user');
@@ -128,9 +144,13 @@ function PreferencesController($scope, $http, $cookieStore) {
 		headers: {
 			'X-Session-Token': $cookieStore.get('user').session_token
 		}
-	}).error(function(data) {
+	}).error(function(data, status) {
 		if (angular.isObject(data) == true && data.error != undefined) {
 			alertify.error("Error: " + data.error);
+		}
+		if (status == 401) {
+			$cookieStore.remove('user');
+			$location.path('/login');
 		}
 	}).success(function(data) {
 		$scope.refresh_rate = data.refresh_rate;
@@ -144,9 +164,13 @@ function PreferencesController($scope, $http, $cookieStore) {
 			headers: {
 				'X-Session-Token': $cookieStore.get('user').session_token
 			}
-		}).error(function(data) {
+		}).error(function(data, status) {
 			if (angular.isObject(data) == true && data.error != undefined) {
 				alertify.error("Error: " + data.error);
+			}
+			if (status == 401) {
+				$cookieStore.remove('user');
+				$location.path('/login');
 			}
 		}).success(function(data) {
 			alertify.success("Your preferences have been saved");
@@ -157,9 +181,13 @@ function PreferencesController($scope, $http, $cookieStore) {
 			headers: {
 				'X-Session-Token': $cookieStore.get('user').session_token
 			}
-		}).error(function(data) {
+		}).error(function(data, status) {
 			if (angular.isObject(data) == true && data.error != undefined) {
 				alertify.error("Error logging you out: " + data.error);
+			}
+			if (status == 401) {
+				$cookieStore.remove('user');
+				$location.path('/login');
 			}
 		}).success(function(data) {
 			$cookieStore.remove('user');
