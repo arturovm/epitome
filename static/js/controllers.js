@@ -24,7 +24,7 @@ function SubscriptionsController($scope, $document, $http, $cookieStore, $locati
 				'Content-Type': 'application/x-www-form-urlencoded',
 				'X-Session-Token': $cookieStore.get('user').session_token
 			}
-		}).error(function(data status) {
+		}).error(function(data, status) {
 			if (angular.isObject(data) == true && data.error != undefined) {
 				alertify.error("Error creating feed: " + data.error);
 			}
