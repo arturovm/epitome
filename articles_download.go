@@ -97,12 +97,12 @@ func processArticles(articleChannel *chan *[]Article, tx *sql.Tx, waitGroup *syn
 }
 
 func insertFinalArticleSlice(articles *[]Article, tx *sql.Tx) {
-	stmt, err := tx.Prepare("insert into articles values (null, ?, ?, ?, ?, datetime(?), ?, ?, ?, ?, ?)")
+	stmt, err := tx.Prepare("insert into articles values (null, ?, ?, ?, ?, datetime(?), ?, ?, ?, ?, null)")
 	if err != nil {
 		log.Println("Article Download Error | Insert error: " + err.Error())
 	}
 	for _, v := range *articles {
-		_, err := stmt.Exec(v.SubscriptionId, v.Url, v.Title, v.Author, v.Published.Format(time.RFC3339), v.Body.Content, v.Body.Type, v.Summary.Content, v.Summary.Type, v.Read)
+		_, err := stmt.Exec(v.SubscriptionId, v.Url, v.Title, v.Author, v.Published.Format(time.RFC3339), v.Body.Content, v.Body.Type, v.Summary.Content, v.Summary.Type)
 		if err != nil {
 			log.Println("Articles error: " + err.Error())
 		}
