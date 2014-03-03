@@ -230,7 +230,7 @@ func PutArticle(w http.ResponseWriter, req *http.Request) {
 	switch status {
 	case "read":
 		if alreadyRead != true {
-			DB.Exec("insert into user_read_articles values (null, ?, ?, ?)", u.Id, artId, false)
+			DB.Exec("insert into user_read_articles values (null, ?, ?, ?)", u.Id, artId, true)
 		}
 	case "unread":
 		if alreadyRead == true {
