@@ -219,13 +219,7 @@ func formatRSS(sub *Subscription, doc *xml.XmlDocument, articles *[]Article) {
 		// Summary
 		summaryNodes, _ := v.Search(v.Path() + "/description")
 		if len(summaryNodes) > 0 {
-			var summaryString string
-			if summaryNodes[0].FirstChild().NodeType() == xml.XML_CDATA_SECTION_NODE {
-				summaryString = summaryNodes[0].FirstChild().Content()
-			} else {
-				summaryString = summaryNodes[0].FirstChild().InnerHtml()
-			}
-			article.Summary.Content = html.UnescapeString(summaryString)
+			article.Summary.Content = html.UnescapeString(summaryNodes[0].FirstChild().Content())
 			article.Summary.Type = "html"
 		}
 		// Body
