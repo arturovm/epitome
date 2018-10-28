@@ -1,5 +1,2 @@
-*.gob
-main
-.DS_Store
-*.swp
-*.db
+vendor
+bin
