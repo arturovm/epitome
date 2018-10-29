@@ -1,12 +1,12 @@
-# Pond
+# Epitome (formerly Pond)
 
 _Current version:_ `0.1.1`
 
 ## Table of Contents
 
 1. [Introduction & Overview](#introduction--overview)
-2. [Pond as a Protocol](#pond-as-a-protocol)
-3. [Pond as an App](#pond-as-an-app)
+2. [Epitome as a Protocol](#pond-as-a-protocol)
+3. [Epitome as an App](#pond-as-an-app)
    * [Installing](#installing)
    * [Building](#building)
    * [Usage](#usage)
@@ -19,23 +19,23 @@ _Current version:_ `0.1.1`
 
 ## Introduction & Overview
 
-Pond is a protocol that aims to standardize Atom+RSS syncing across the web. It's also a self–hosted alternative to the backend part of Google Reader, written in Go.
+Epitome is a protocol that aims to standardize Atom+RSS syncing across the web. It's also a self–hosted alternative to the backend part of Google Reader, written in Go.
 
-## Pond as a Protocol
+## Epitome as a Protocol
 
-Pond defines a set of [RESTful HTTP API endpoints](https://github.com/ArturoVM/pond/blob/master/api_doc.md) that receive and send data in a standardized format, while making it very comfortable for developers to use. Comfort, ease of use, minimalism and elegance are Pond's primary design goals.
+Epitome defines a set of [RESTful HTTP API endpoints](https://github.com/ArturoVM/pond/blob/master/api_doc.md) that receive and send data in a standardized format, while making it very comfortable for developers to use. Comfort, ease of use, minimalism and elegance are Epitome's primary design goals.
 
-Anybody can implement Pond using their technology stack of choice. It could be used in a multi–user environment (as is the case with the reference implementation), or a single–user environment.
+Anybody can implement Epitome using their technology stack of choice. It could be used in a multi–user environment (as is the case with the reference implementation), or a single–user environment.
 
-Pond also aims to allow developers to build upon it: other protocols can be thrown on top (such as the Tent protocol), as long as the implementation satisfies all the API endpoints.
+Epitome also aims to allow developers to build upon it: other protocols can be thrown on top (such as the Tent protocol), as long as the implementation satisfies all the API endpoints.
 
-All of this allows for a (hopefully) bright future: if developers were to adopt Pond in their services, maximum portability would be achieved, without all the pain that comes with learning and implementing new APIs; let alone the mess that RSS is.
+All of this allows for a (hopefully) bright future: if developers were to adopt Epitome in their services, maximum portability would be achieved, without all the pain that comes with learning and implementing new APIs; let alone the mess that RSS is.
 
-## Pond as an App
+## Epitome as an App
 
-The Pond reference implementation does _not_ include a feed reader; it is just a backend that feed reading apps can use to sync your feeds and articles across devices. 
+The Epitome reference implementation does _not_ include a feed reader; it is just a backend that feed reading apps can use to sync your feeds and articles across devices. 
 
-It's worth noting that I aim to make the Pond reference implementation as high quality as possible so it can also be used in production, and it's not just there as a learning tool.
+It's worth noting that I aim to make the Epitome reference implementation as high quality as possible so it can also be used in production, and it's not just there as a learning tool.
 
 ### Installing
 
@@ -43,7 +43,7 @@ Because Go compiles and links all libraries statically, you can download the app
 
 ### Building
 
-To build Pond, you need the following dependencies:
+To build Epitome, you need the following dependencies:
 
 * moovweb/gokogiri
 * bmizerany/pat
@@ -75,7 +75,7 @@ git checkout develop
 
 ### Usage
 
-To run the Pond binary, simply do:
+To run the Epitome binary, simply do:
 
 ```bash
 ./pond
@@ -105,7 +105,7 @@ If verbose mode is off, this option is a no–op. Keep in mind that if you use t
 
 #### First and foremost? Testing, testing, testing.
 
-Atom is amazing and awesome and unicorns and rainbows. RSS is not. RSS is a messy pain in the ass—kinda like diarrhea. I need people to test the program and try to break it (bug reporting will be _very_ appreciated), so I can sort out all the little quirks and handle all sorts of use cases, and make the Pond reference implementation much more robust over time.
+Atom is amazing and awesome and unicorns and rainbows. RSS is not. RSS is a messy pain in the ass—kinda like diarrhea. I need people to test the program and try to break it (bug reporting will be _very_ appreciated), so I can sort out all the little quirks and handle all sorts of use cases, and make the Epitome reference implementation much more robust over time.
 
 #### OPML Import and Export
 
