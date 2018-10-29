@@ -11,12 +11,14 @@ import (
 
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
-
 	log.Debug().Msg("debug mode enabled")
 
 	r := router.Get()
 
-	log.Info().Msg("listening on :8080")
+	log.Info().
+		Int("port", 8080).
+		Msg("server starting")
 	log.Fatal().
-		Err(http.ListenAndServe(":8080", r))
+		Err(http.ListenAndServe(":8080", r)).
+		Msg("server error")
 }

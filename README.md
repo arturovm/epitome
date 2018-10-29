@@ -5,8 +5,8 @@ _Current version:_ `0.1.1`
 ## Table of Contents
 
 1. [Introduction & Overview](#introduction--overview)
-2. [Epitome as a Protocol](#pond-as-a-protocol)
-3. [Epitome as an App](#pond-as-an-app)
+2. [Epitome as a Standard](#epitome-as-a-protocol)
+3. [Epitome as an App](#epitome-as-an-app)
    * [Installing](#installing)
    * [Building](#building)
    * [Usage](#usage)
@@ -19,21 +19,21 @@ _Current version:_ `0.1.1`
 
 ## Introduction & Overview
 
-Epitome is a protocol that aims to standardize Atom+RSS syncing across the web. It's also a self–hosted alternative to the backend part of Google Reader, written in Go.
+Epitome is a protocol that aims to standardize Atom+RSS syncing across the web. It's also a self-hosted alternative to the backend part of Google Reader, written in Go.
 
-## Epitome as a Protocol
+## Epitome as a Standard
 
-Epitome defines a set of [RESTful HTTP API endpoints](https://github.com/ArturoVM/pond/blob/master/api_doc.md) that receive and send data in a standardized format, while making it very comfortable for developers to use. Comfort, ease of use, minimalism and elegance are Epitome's primary design goals.
+Epitome defines a set of [RESTful HTTP API endpoints](https://github.com/ArturoVM/epitome/blob/master/api_doc.md) that receive and send data in a standardized format, while making it very comfortable for developers to use. Comfort, ease of use, minimalism and elegance are Epitome's primary design goals.
 
-Anybody can implement Epitome using their technology stack of choice. It could be used in a multi–user environment (as is the case with the reference implementation), or a single–user environment.
+Anybody can implement Epitome using their technology stack of choice. It could be used in a multi-user environment (as is the case with the reference implementation), or a single-user environment.
 
-Epitome also aims to allow developers to build upon it: other protocols can be thrown on top (such as the Tent protocol), as long as the implementation satisfies all the API endpoints.
+Epitome also aims to allow developers to build upon it: other protocols can be thrown on top, as long as the implementation satisfies all the API endpoints.
 
 All of this allows for a (hopefully) bright future: if developers were to adopt Epitome in their services, maximum portability would be achieved, without all the pain that comes with learning and implementing new APIs; let alone the mess that RSS is.
 
 ## Epitome as an App
 
-The Epitome reference implementation does _not_ include a feed reader; it is just a backend that feed reading apps can use to sync your feeds and articles across devices. 
+The Epitome reference implementation does _not_ include a feed reader; it is just a backend that feed reading apps can use to sync user's feeds and articles across devices. 
 
 It's worth noting that I aim to make the Epitome reference implementation as high quality as possible so it can also be used in production, and it's not just there as a learning tool.
 
@@ -62,9 +62,9 @@ go get -u code.google.com/p/go.crypto/bcrypt
 Then, do:
 
 ```bash
-git clone git://github.com/ArturoVM/pond.git
-cd pond
-go build -o pond *.go
+git clone git://github.com/ArturoVM/epitome.git
+cd epitome
+go build -o epitome *.go
 ```
 
 If you want cutting edge, before building, do:
@@ -78,28 +78,28 @@ git checkout develop
 To run the Epitome binary, simply do:
 
 ```bash
-./pond
+./epitome
 ```
 
 To specify a port other than the default one, use the `--port` flag (or its shorthand `-p`):
 
 ```bash
-./pond -p 8080
+./epitome -p 8080
 ```
 
 To enable verbose mode (useful for debugging and development), use the `--verbose` flag:
 
 ```bash
-./pond -p 8080 --verbose
+./epitome -p 8080 --verbose
 ```
 
 During verbose mode, you can choose whether to log requests' bodies or not (default is off):
 
 ```bash
-./pond -p 8080 --verbose --log-body
+./epitome -p 8080 --verbose --log-body
 ```
 
-If verbose mode is off, this option is a no–op. Keep in mind that if you use this option during verbose mode, memory usage could increase significantly (definitely not recommended during production).
+If verbose mode is off, this option is a no-op. Keep in mind that if you use this option during verbose mode, memory usage could increase significantly (definitely not recommended during production).
 
 ### What's Missing for 1.0?
 
@@ -113,7 +113,7 @@ Which will very likely be added in 0.2.0
 
 #### Favorites API
 
-Which will also very likely be added in a near–future minor version.
+Which will also very likely be added in a near-future minor version.
 
 #### Support for Enclosures
 
@@ -137,6 +137,6 @@ You can very easily infer what's in each file based on its name (e.g. route defi
 
 Just download the app, use it as much as you can (but, of course, don't rely on it just yet) and submit any bugs you encounter or feature requests you may have.
 
-### Protocol Definition
+### Standard Definition
 
-You can contribute a lot just by giving your views of the protocol. If there's something you think isn't quite right, or know how it could be improved, submit it to the issue tracker.
+You can contribute a lot just by giving your views of the standard. If there's something you think isn't quite right, or know how it could be improved, submit it to the issue tracker.
