@@ -23,7 +23,7 @@ Epitome is a protocol that aims to standardize Atom+RSS syncing across the web. 
 
 ## Epitome as a Standard
 
-Epitome defines a set of [RESTful HTTP API endpoints](https://github.com/ArturoVM/epitome/blob/master/api_doc.md) that receive and send data in a standardized format, while making it very comfortable for developers to use. Comfort, ease of use, minimalism and elegance are Epitome's primary design goals.
+Epitome defines a set of [RESTful HTTP API endpoints](https://github.com/arturovm/epitome/blob/master/api_doc.md) that receive and send data in a standardized format, while making it very comfortable for developers to use. Comfort, ease of use, minimalism and elegance are Epitome's primary design goals.
 
 Anybody can implement Epitome using their technology stack of choice. It could be used in a multi-user environment (as is the case with the reference implementation), or a single-user environment.
 
@@ -62,7 +62,7 @@ go get -u code.google.com/p/go.crypto/bcrypt
 Then, do:
 
 ```bash
-git clone git://github.com/ArturoVM/epitome.git
+git clone git://github.com/arturovm/epitome.git
 cd epitome
 go build -o epitome *.go
 ```

@@ -2,6 +2,17 @@
 
 
 [[projects]]
+  digest = "1:2f99776ce3e90e6aa852cb6a92c551f5017142d897e34f832a0a1c08c6602949"
+  name = "github.com/gocraft/dbr"
+  packages = [
+    ".",
+    "dialect",
+  ]
+  pruneopts = "UT"
+  revision = "042fe86dc2daa9684f746ab337971e84147e8856"
+  version = "v2.4"
+
+[[projects]]
   digest = "1:f97285a3b0a496dcf8801072622230d513f69175665d94de60eb042d03387f6c"
   name = "github.com/julienschmidt/httprouter"
   packages = ["."]
@@ -10,17 +21,44 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:6342a41a66687c0d0eb1f4d946447bfb808c5136adeb92903ed07972071e19ac"
-  name = "github.com/rs/zerolog"
-  packages = [
-    ".",
-    "internal/cbor",
-    "internal/json",
-    "log",
-  ]
+  digest = "1:0a69a1c0db3591fcefb47f115b224592c8dfa4368b7ba9fae509d5e16cdc95c8"
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
   pruneopts = "UT"
-  revision = "338f9bc14084d22cb8eeacd6492861f8449d715c"
-  version = "v1.9.1"
+  revision = "5c8c8bd35d3832f5d134ae1e1e375b69a4d25242"
+  version = "v1.0.1"
+
+[[projects]]
+  digest = "1:4a49346ca45376a2bba679ca0e83bec949d780d4e927931317904bad482943ec"
+  name = "github.com/mattn/go-sqlite3"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "c7c4067b79cc51e6dfdcef5c702e74b1e0fa7c75"
+  version = "v1.10.0"
+
+[[projects]]
+  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
+  digest = "1:65c6401efaeb147041aed03d5b18862ce666a54e4ce754ea6ddbfa5ddaa24b07"
+  name = "github.com/pressly/goose"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "95600eb369b1f657efd54a401ab85d0647a1db80"
+  version = "v2.3.0"
+
+[[projects]]
+  digest = "1:3f53e9e4dfbb664cd62940c9c4b65a2171c66acd0b7621a1a6b8e78513525a52"
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ad15b42461921f1fb3529b058c6786c6a45d5162"
+  version = "v1.1.1"
 
 [[projects]]
   digest = "1:c1b1102241e7f645bc8e0c22ae352e8f0dc6484b6cb4d132fa9f24174e0119e2"
@@ -30,13 +68,35 @@
   revision = "298182f68c66c05229eb03ac171abe6e309ee79a"
   version = "v1.0.3"
 
+[[projects]]
+  branch = "master"
+  digest = "1:3f3a05ae0b95893d90b9b3b5afdb79a9b3d96e4e36e099d841ae602e4aca0da8"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  pruneopts = "UT"
+  revision = "b078efbc8099b041569edb8c6ab625cd430e3fce"
+
+[[projects]]
+  branch = "master"
+  digest = "1:a5090ea95e2600b2a369df77359c5871948f12bc8f0632db0342f5acc5e30c1d"
+  name = "golang.org/x/sys"
+  packages = [
+    "unix",
+    "windows",
+  ]
+  pruneopts = "UT"
+  revision = "d69651ed3497faee15a5363a89578e9991f6d5e2"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/gocraft/dbr",
     "github.com/julienschmidt/httprouter",
-    "github.com/rs/zerolog",
-    "github.com/rs/zerolog/log",
+    "github.com/mattn/go-sqlite3",
+    "github.com/pkg/errors",
+    "github.com/pressly/goose",
+    "github.com/sirupsen/logrus",
     "github.com/spf13/pflag",
   ]
   solver-name = "gps-cdcl"
