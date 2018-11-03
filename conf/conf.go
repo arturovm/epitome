@@ -42,6 +42,13 @@ func binDir() string {
 		log.WithField("error", err).
 			Warn("failed to obtain executable directory")
 	}
+
+	binDir, err = filepath.EvalSymlinks(binDir)
+	if err != nil {
+		log.WithField("error", err).
+			Warn("failed to evaluate symlinks")
+	}
+
 	return filepath.Dir(binDir)
 }
 
@@ -50,7 +57,7 @@ func baseDir() string {
 }
 
 // DataDir returns the application's data directory. If unset by the user it
-// defaults to a location with the path ".epitome/data" within the same
+// defaults to a location with the path "data" within the same
 // directory as the executable. If unable to retrieve the executable's path,
 // it defaults to an empty string, meaning, the user's working directory at
 // the time of invocation.
@@ -58,7 +65,7 @@ func DataDir() string {
 	if dataDir != "" {
 		return dataDir
 	}
-	return filepath.Join(baseDir(), "data")
+	return filepath.Join(binDir(), "data")
 }
 
 // MigrationsDir returns the application's migrations directory. If unset by

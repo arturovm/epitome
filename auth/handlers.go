@@ -6,8 +6,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// PostSessions handles POST requests to the sessions endpoint
-func PostSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+// PostSession handles POST requests to the sessions endpoint
+func PostSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 }
 
