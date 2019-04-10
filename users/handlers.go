@@ -21,7 +21,7 @@ func PostUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 
 	// create user in database
-	u, err = user.Create(ru.Username, ru.Password)
+	u, err := user.Create(ru.Username, ru.Password)
 	if err != nil {
 		switch err {
 		case user.ErrInvalidPassword:
