@@ -21,25 +21,30 @@ func PostUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 
 	// create user in database
-	_, err = user.Create(ru.Username, ru.Password)
+	u, err = user.Create(ru.Username, ru.Password)
 	if err != nil {
 		switch err {
 		case user.ErrInvalidPassword:
 			w.WriteHeader(http.StatusBadRequest)
-			return
 		case user.ErrPasswordHashingFailed:
 			w.WriteHeader(http.StatusInternalServerError)
-			return
 		case user.ErrUserExists:
 			w.WriteHeader(http.StatusConflict)
-			return
 		default:
 			log.WithField("error", err).Error("error creating user")
 			w.WriteHeader(http.StatusInternalServerError)
-			return
 		}
+		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
+
+	// encode user in response
+	enc := json.NewEncoder(w)
+	err = enc.Encode(u)
+	if err != nil {
+		log.WithField("error", err).Error("error encoding user")
+	}
+
 	return
 }
