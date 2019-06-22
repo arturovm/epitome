@@ -3,10 +3,10 @@ module github.com/arturovm/epitome
 go 1.12
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.3.3 // indirect
+	github.com/Masterminds/squirrel v1.1.0
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
-	github.com/gocraft/dbr v0.0.0-20181029195440-042fe86dc2da
-	github.com/jmoiron/sqlx v1.2.0 // indirect
+	github.com/google/uuid v1.1.1
+	github.com/jmoiron/sqlx v1.2.0
 	github.com/julienschmidt/httprouter v1.2.0
 	github.com/mattn/go-sqlite3 v1.10.0
 	github.com/pkg/errors v0.8.0
