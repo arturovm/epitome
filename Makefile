@@ -2,13 +2,10 @@
 
 all: app frontend
 
-app: vendor
+app:
 	go build -o bin/epitome github.com/arturovm/epitome/cmd/epitome
 	mkdir -p bin/.epitome
 	cp -r migrations bin/
-
-vendor: Gopkg.toml Gopkg.lock
-	dep ensure
 
 run: bin/epitome
 	./bin/epitome --debug
