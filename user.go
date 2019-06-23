@@ -21,13 +21,14 @@ const (
 	bcryptCost = 14
 )
 
-// ErrInvalidPassword is returned when the given password doesn't satisfy
-// the minimum criteria.
-var ErrInvalidPassword = errors.New("password is invalid")
-
-// ErrPasswordHashingFailed is returned when an error occurred during the
-// password hashing process.
-var ErrPasswordHashingFailed = errors.New("failed to hash password")
+var (
+	// ErrInvalidPassword is returned when the given password doesn't satisfy
+	// the minimum criteria.
+	ErrInvalidPassword = errors.New("password is invalid")
+	// ErrPasswordHashingFailed is returned when an error occurred during the
+	// password hashing process.
+	ErrPasswordHashingFailed = errors.New("failed to hash password")
+)
 
 // NewUser initializes a new user with the given parameters.
 func NewUser(username, password string) (*User, error) {
