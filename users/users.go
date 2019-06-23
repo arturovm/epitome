@@ -12,6 +12,10 @@ type Users struct {
 	users storage.UserRepository
 }
 
+// ErrInvalidPassword is returned when the given password doesn't satisfy
+// the minimum criteria.
+var ErrInvalidPassword = errors.New("password is invalid")
+
 // New takes a user repository and returns an initialized users service.
 func New(users storage.UserRepository) *Users {
 	return &Users{users: users}
