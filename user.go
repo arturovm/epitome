@@ -71,3 +71,11 @@ func hashPassword(p string) (hash []byte, salt []byte, err error) {
 
 	return hash, salt, err
 }
+
+func (u *User) PasswordMatch(password string) bool {
+	err := bcrypt.CompareHashAndPassword(u.Password, []byte(password))
+	if err == nil {
+		return true
+	}
+	return false
+}

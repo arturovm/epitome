@@ -9,7 +9,9 @@ import (
 
 // Manager is a storage manager that abstracts database details.
 type Manager struct {
+	db *sqlx.DB
 	*UserRepository
+	*SessionRepository
 }
 
 const driverName = "sqlite3"
@@ -20,7 +22,11 @@ func New(path string) (*Manager, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Manager{&UserRepository{db}}, nil
+	return &Manager{
+		db:                db,
+		UserRepository:    &UserRepository{db},
+		SessionRepository: &SessionRepository{db},
+	}, nil
 }
 
 // Migrate attempts to apply the migrations in the given directory to the
