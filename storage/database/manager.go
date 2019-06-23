@@ -7,12 +7,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Manager is a storage manager that abstracts database details.
 type Manager struct {
 	*UserRepository
 }
 
 const driverName = "sqlite3"
 
+// New takes a path and opens a sqlite3 connection to the given file.
 func New(path string) (*Manager, error) {
 	db, err := sqlx.Connect(driverName, path)
 	if err != nil {
@@ -21,6 +23,8 @@ func New(path string) (*Manager, error) {
 	return &Manager{&UserRepository{db}}, nil
 }
 
+// Migrate attempts to apply the migrations in the given directory to the
+// database up to the given version.
 func (m *Manager) Migrate(v int64, dir string) error {
 	goose.SetDialect(driverName)
 	goose.SetLogger(log.StandardLogger())

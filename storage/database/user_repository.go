@@ -8,10 +8,12 @@ import (
 	"github.com/arturovm/epitome"
 )
 
+// UserRepository implements storage.UserRepository.
 type UserRepository struct {
 	db *sqlx.DB
 }
 
+// Add implements UserRepository.Add.
 func (r *UserRepository) Add(user epitome.User) error {
 	_, err := squirrel.Insert("users").
 		Columns("username", "password", "salt").
@@ -21,6 +23,7 @@ func (r *UserRepository) Add(user epitome.User) error {
 	return err
 }
 
+// ByUsername implements UserRepository.ByUsername.
 func (r *UserRepository) ByUsername(username string) (*epitome.User, error) {
 	query, args, err := squirrel.Select("username", "password", "salt").
 		From("users").
