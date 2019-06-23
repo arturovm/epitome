@@ -27,3 +27,7 @@ func (u *Users) SignUp(username, password string) error {
 	}
 	return nil
 }
+
+func (u *Users) UserInfo(username string) (*epitome.User, error) {
+	return u.repository.ByUsername(username)
+}

@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
@@ -12,10 +11,9 @@ import (
 
 // User represents a system user
 type User struct {
-	ID       uuid.UUID
-	Username string
-	Password []byte
-	Salt     []byte
+	Username string `json:"username"`
+	Password []byte `json:"-"`
+	Salt     []byte `json:"-"`
 }
 
 const (

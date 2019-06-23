@@ -1,15 +1,13 @@
 package main
 
 import (
-	"net"
-	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 
+	"github.com/arturovm/epitome/api"
 	"github.com/arturovm/epitome/conf"
 	"github.com/arturovm/epitome/filemanager"
-	"github.com/arturovm/epitome/router"
+	"github.com/arturovm/epitome/server"
 	"github.com/arturovm/epitome/storage/database"
 	log "github.com/sirupsen/logrus"
 )
@@ -54,8 +52,11 @@ func main() {
 	log.WithField("path", migrationsDir).Debug("running migrations")
 	err = storageManager.Migrate(dbVersion, migrationsDir)
 
-	// setup router
-	r := router.Get()
+	// setup API port
+	a := api.New(storageManager)
+
+	// setup http adapter
+	s := server.New(a)
 
 	// start server
 	log.WithFields(log.Fields{
@@ -63,7 +64,6 @@ func main() {
 		"port":    conf.Port,
 	}).Info("server starting")
 
-	addr := net.JoinHostPort(conf.Addr, strconv.Itoa(conf.Port))
-	log.WithField("error", http.ListenAndServe(addr, r)).
+	log.WithField("error", s.Start(conf.Addr, conf.Port)).
 		Fatal("server error")
 }
