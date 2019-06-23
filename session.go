@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Session represents a user's session on the server.
 type Session struct {
 	ID       uuid.UUID
 	Key      []byte
@@ -15,6 +16,7 @@ type Session struct {
 
 const keyLen = 256
 
+// NewSession generates a new session for the given username.
 func NewSession(username string) (*Session, error) {
 	key := make([]byte, keyLen/8)
 	_, err := rand.Read(key)

@@ -12,7 +12,7 @@ type Users struct {
 	users storage.UserRepository
 }
 
-// New takes a user repository and returns an initializes users service.
+// New takes a user repository and returns an initialized users service.
 func New(users storage.UserRepository) *Users {
 	return &Users{users: users}
 }
