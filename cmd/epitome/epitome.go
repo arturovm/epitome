@@ -61,8 +61,8 @@ func main() {
 	a := api.New(storageManager)
 
 	// setup http adapter
-	_ = server.NewAPIHandler(a)
-	s := server.New(a)
+	h := server.NewAPIHandler(a)
+	s := server.New(h)
 
 	// start server
 	log.WithFields(log.Fields{
