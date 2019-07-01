@@ -6,20 +6,14 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	log "github.com/sirupsen/logrus"
-
-	"github.com/arturovm/epitome/users"
 )
-
-type usersHandler struct {
-	users *users.Users
-}
 
 type requestUser struct {
 	Username string
 	Password string
 }
 
-func (u *usersHandler) postUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *APIHandler) postUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	dec := json.NewDecoder(r.Body)
 
 	var user requestUser
@@ -29,7 +23,7 @@ func (u *usersHandler) postUser(w http.ResponseWriter, r *http.Request, _ httpro
 		return
 	}
 
-	err = u.users.SignUp(user.Username, user.Password)
+	err = h.api.Users().SignUp(user.Username, user.Password)
 	if err != nil {
 		log.WithField("error", err).Error("error creating user")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -39,9 +33,9 @@ func (u *usersHandler) postUser(w http.ResponseWriter, r *http.Request, _ httpro
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (u *usersHandler) getUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *APIHandler) getUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	username := ps.ByName("username")
-	user, err := u.users.UserInfo(username)
+	user, err := h.api.Users().UserInfo(username)
 	if err != nil {
 		log.WithField("error", err).Error("error getting user")
 		w.WriteHeader(http.StatusInternalServerError)

@@ -6,7 +6,7 @@ app: bin/epitome
 	mkdir -p bin/.epitome
 	cp -r migrations bin/
 
-bin/epitome:
+bin/epitome: $(shell find . -path '**/*.go')
 	go build -o bin/epitome github.com/arturovm/epitome/cmd/epitome
 
 run: bin/epitome

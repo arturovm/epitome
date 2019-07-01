@@ -4,12 +4,13 @@ import (
 	"os"
 	"path/filepath"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/arturovm/epitome/api"
 	"github.com/arturovm/epitome/conf"
 	"github.com/arturovm/epitome/filemanager"
 	"github.com/arturovm/epitome/server"
 	"github.com/arturovm/epitome/storage/database"
-	log "github.com/sirupsen/logrus"
 )
 
 const dbVersion = 1
@@ -51,11 +52,16 @@ func main() {
 
 	log.WithField("path", migrationsDir).Debug("running migrations")
 	err = storageManager.Migrate(dbVersion, migrationsDir)
+	if err != nil {
+		log.WithField("error", err).
+			Fatal("failed to run migrations")
+	}
 
 	// setup API port
 	a := api.New(storageManager)
 
 	// setup http adapter
+	_ = server.NewAPIHandler(a)
 	s := server.New(a)
 
 	// start server

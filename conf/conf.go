@@ -52,10 +52,6 @@ func binDir() string {
 	return filepath.Dir(binDir)
 }
 
-func baseDir() string {
-	return filepath.Join(binDir(), ".epitome")
-}
-
 // DataDir returns the application's data directory. If unset by the user it
 // defaults to a location with the path "data" within the same
 // directory as the executable. If unable to retrieve the executable's path,

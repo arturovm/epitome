@@ -21,7 +21,7 @@ const (
 	bcryptCost = 14
 )
 
-// ErrPasswordHashingFailed is returned when an error occurred during the
+// ErrPasswordHashingFailed is returned when an error occurrs during the
 // password hashing process.
 var ErrPasswordHashingFailed = errors.New("failed to hash password")
 
@@ -52,9 +52,7 @@ func hashPassword(p string) (hash []byte, salt []byte, err error) {
 
 	// prepend salt to password
 	data := make([]byte, len(salt)+len(p))
-	for i := range salt {
-		data[i] = salt[i]
-	}
+	copy(data, salt)
 	for i := 0; i < len(p); i++ {
 		data[saltLen+i] = p[i]
 	}
@@ -72,8 +70,5 @@ func hashPassword(p string) (hash []byte, salt []byte, err error) {
 // and returns whether they match or not.
 func (u *User) PasswordMatch(password string) bool {
 	err := bcrypt.CompareHashAndPassword(u.Password, []byte(password))
-	if err == nil {
-		return true
-	}
-	return false
+	return err == nil
 }

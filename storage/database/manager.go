@@ -2,7 +2,8 @@ package database
 
 import (
 	"github.com/jmoiron/sqlx"
-	_ "github.com/mattn/go-sqlite3" // import for driver only
+	_ "github.com/mattn/go-sqlite3" // imported for driver only
+	"github.com/pkg/errors"
 	"github.com/pressly/goose"
 	log "github.com/sirupsen/logrus"
 )
@@ -32,7 +33,10 @@ func New(path string) (*Manager, error) {
 // Migrate attempts to apply the migrations in the given directory to the
 // database up to the given version.
 func (m *Manager) Migrate(v int64, dir string) error {
-	goose.SetDialect(driverName)
+	err := goose.SetDialect(driverName)
+	if err != nil {
+		return errors.Wrap(err, "error setting goose dialect")
+	}
 	goose.SetLogger(log.StandardLogger())
 	return goose.UpTo(m.db.DB, dir, v)
 }
