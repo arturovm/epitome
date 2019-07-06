@@ -11,18 +11,14 @@ type User struct {
 }
 
 // NewUser initializes a new user with the given parameters.
-func NewUser(username string) User {
+func NewUser(username string, credentials *Credentials) User {
 	return User{
-		Username: strings.ToLower(username),
+		Username:    strings.ToLower(username),
+		credentials: credentials,
 	}
 }
 
 // Credentials returns a user's credentials.
 func (u *User) Credentials() *Credentials {
 	return u.credentials
-}
-
-// SetCredentials sets a user's credentials to the supplied value.
-func (u *User) SetCredentials(credentials *Credentials) {
-	u.credentials = credentials
 }

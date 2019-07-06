@@ -10,12 +10,12 @@ import (
 
 func TestNewUser(t *testing.T) {
 	name := "testuser"
-	u := epitome.NewUser(name)
+	u := epitome.NewUser(name, nil)
 	require.Equal(t, u.Username, name)
 }
 
 func TestNewUserMixedCase(t *testing.T) {
 	name := "TestUser"
-	u := epitome.NewUser(name)
+	u := epitome.NewUser(name, nil)
 	require.Equal(t, u.Username, "testuser")
 }

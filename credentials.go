@@ -22,8 +22,8 @@ const (
 // password hashing process.
 var ErrPasswordHashingFailed = errors.New("failed to hash password")
 
-// NewCredentials takes a password and generates a new set of credentials.
-func NewCredentials(password string) (*Credentials, error) {
+// GenerateCredentials takes a password and generates a new set of credentials.
+func GenerateCredentials(password string) (*Credentials, error) {
 	hash, salt, err := hashPassword(password)
 	if err != nil {
 		return nil, ErrPasswordHashingFailed
