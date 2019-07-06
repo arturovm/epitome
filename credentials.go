@@ -7,6 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Credentials contains a user's credentials.
 type Credentials struct {
 	Password []byte
 	Salt     []byte
@@ -17,17 +18,11 @@ const (
 	bcryptCost = 14
 )
 
-// hash password
-// hash, salt, err := hashPassword(password)
-// if err != nil {
-//         log.WithField("error", err).Error("error hashing password")
-//         return nil, ErrPasswordHashingFailed
-// }
-
 // ErrPasswordHashingFailed is returned when an error occurrs during the
 // password hashing process.
 var ErrPasswordHashingFailed = errors.New("failed to hash password")
 
+// NewCredentials takes a password and generates a new set of credentials.
 func NewCredentials(password string) (*Credentials, error) {
 	hash, salt, err := hashPassword(password)
 	if err != nil {
@@ -68,7 +63,7 @@ func prependSalt(salt []byte, password string) []byte {
 	return data
 }
 
-// PasswordMatch compares a user's hashed password agsinst the given password
+// MatchPassword compares a user's hashed password agsinst the given password
 // and returns whether they match or not.
 func (c *Credentials) MatchPassword(password string) bool {
 	data := prependSalt(c.Salt, password)
