@@ -15,14 +15,19 @@ type API struct {
 
 // New takes a database manager and returns an initialized API.
 func New(m *database.Manager) (*API, error) {
-	us, err := users.New(m.UserRepository)
+	usrs, err := users.New(m.UserRepository)
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot initialize users service")
 	}
+
+	auth, err := authentication.New(m.SessionRepository, m.UserRepository)
+	if err != nil {
+		return nil, errors.Wrap(err,
+			"cannot intialize authentication service")
+	}
 	return &API{
-		users: us,
-		authentication: authentication.New(m.SessionRepository,
-			m.UserRepository),
+		users:          usrs,
+		authentication: auth,
 	}, nil
 }
 

@@ -10,18 +10,18 @@ import (
 	"github.com/arturovm/epitome/users"
 )
 
+func TestNewUsersServiceNoRepo(t *testing.T) {
+	us, err := users.New(nil)
+	require.Error(t, err)
+	require.Nil(t, us)
+}
+
 func TestNewUsersService(t *testing.T) {
 	var repo mockstorage.UserRepository
 	us, err := users.New(&repo)
 	require.NoError(t, err)
 	require.NotNil(t, us)
 	repo.AssertExpectations(t)
-}
-
-func TestNewUsersServiceNoRepo(t *testing.T) {
-	us, err := users.New(nil)
-	require.Error(t, err)
-	require.Nil(t, us)
 }
 
 func TestSignUp(t *testing.T) {
@@ -34,9 +34,7 @@ func TestSignUp(t *testing.T) {
 	user, err := us.SignUp(username, password)
 	require.NoError(t, err)
 	require.NotNil(t, user)
-
 	require.NotNil(t, user.Credentials())
-
 	repo.AssertExpectations(t)
 }
 

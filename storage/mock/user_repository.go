@@ -20,5 +20,5 @@ func (r *UserRepository) Add(user epitome.User) error {
 // ByUsername implements UserRepository.ByUsername.
 func (r *UserRepository) ByUsername(username string) (*epitome.User, error) {
 	args := r.Mock.Called(username)
-	return args.Get(0).(*epitome.User), args.Error(0)
+	return args.Get(0).(*epitome.User), args.Error(1)
 }

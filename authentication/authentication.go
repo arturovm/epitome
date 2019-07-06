@@ -7,9 +7,9 @@ import (
 	"github.com/arturovm/epitome/storage"
 )
 
-// ErrWrongCredentials is returned when the given username or passsword don't
+// ErrInvalidCredentials is returned when the given username or passsword don't
 // match those registered with the server.
-var ErrWrongCredentials = errors.New("wrong username or password")
+var ErrInvalidCredentials = errors.New("wrong username or password")
 
 // Authentication is an authentication management service.
 type Authentication struct {
@@ -19,19 +19,26 @@ type Authentication struct {
 
 // New takes a sessions repository and a users repository and returns an
 // initialized authentication service.
-func New(sessions storage.SessionRepository, users storage.UserRepository) *Authentication {
+func New(sessions storage.SessionRepository, users storage.UserRepository) (*Authentication, error) {
+	if sessions == nil || users == nil {
+		return nil, errors.New("invalid repository")
+	}
 	return &Authentication{
 		sessions: sessions,
 		users:    users,
-	}
+	}, nil
 }
 
 // LogIn creates a new session if the given username and password match those
 // registered with the server.
 func (a *Authentication) LogIn(username, password string) (*epitome.Session, error) {
-	_, err := a.users.ByUsername(username)
+	user, err := a.users.ByUsername(username)
 	if err != nil {
-		return nil, errors.Wrap(err, "error retrieving user")
+		return nil, ErrInvalidCredentials
+	}
+
+	if !user.Credentials().MatchPassword(password) {
+		return nil, ErrInvalidCredentials
 	}
 
 	session, err := epitome.NewSession(username)
