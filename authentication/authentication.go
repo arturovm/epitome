@@ -29,13 +29,9 @@ func New(sessions storage.SessionRepository, users storage.UserRepository) *Auth
 // LogIn creates a new session if the given username and password match those
 // registered with the server.
 func (a *Authentication) LogIn(username, password string) (*epitome.Session, error) {
-	user, err := a.users.ByUsername(username)
+	_, err := a.users.ByUsername(username)
 	if err != nil {
 		return nil, errors.Wrap(err, "error retrieving user")
-	}
-
-	if !user.PasswordMatch(password) {
-		return nil, ErrWrongCredentials
 	}
 
 	session, err := epitome.NewSession(username)

@@ -17,22 +17,28 @@ type Users struct {
 var ErrInvalidPassword = errors.New("password is invalid")
 
 // New takes a user repository and returns an initialized users service.
-func New(users storage.UserRepository) *Users {
-	return &Users{users: users}
+func New(users storage.UserRepository) (*Users, error) {
+	if users == nil {
+		return nil, errors.New("invalid repository")
+	}
+	return &Users{users: users}, nil
 }
 
 // SignUp attempts to create a new user with the given username and password.
-func (u *Users) SignUp(username, password string) error {
-	user, err := epitome.NewUser(username, password)
-	if err != nil {
-		return errors.Wrap(err, "error creating new user")
-	}
+func (u *Users) SignUp(username, password string) (*epitome.User, error) {
+	user := epitome.NewUser(username)
 
-	err = u.users.Add(*user)
+	creds, err := epitome.NewCredentials(password)
 	if err != nil {
-		return errors.Wrap(err, "error saving user")
+		return nil, errors.Wrap(err, "error generating credentials")
 	}
-	return nil
+	user.SetCredentials(creds)
+
+	err = u.users.Add(user)
+	if err != nil {
+		return nil, errors.Wrap(err, "error saving user")
+	}
+	return &user, nil
 }
 
 // UserInfo retrieves a user instance from the database with the given username.

@@ -33,7 +33,7 @@ func main() {
 	log.WithField("path", dataDir).Debug("initializing data directory")
 	err := filemanager.TouchDir(dataDir)
 	if err != nil {
-		log.WithField("error", err).
+		log.WithError(err).
 			Fatal("failed to initialize data directory")
 	}
 
@@ -43,7 +43,7 @@ func main() {
 	log.WithField("path", dbFilename).Debug("initializing storage manager")
 	storageManager, err := database.New(dbFilename)
 	if err != nil {
-		log.WithField("error", err).
+		log.WithError(err).
 			Fatal("failed to initialize storage manager")
 	}
 
@@ -53,12 +53,16 @@ func main() {
 	log.WithField("path", migrationsDir).Debug("running migrations")
 	err = storageManager.Migrate(dbVersion, migrationsDir)
 	if err != nil {
-		log.WithField("error", err).
+		log.WithError(err).
 			Fatal("failed to run migrations")
 	}
 
 	// setup API port
-	a := api.New(storageManager)
+	a, err := api.New(storageManager)
+	if err != nil {
+		log.WithError(err).
+			Fatal("error initializing API port")
+	}
 
 	// setup http adapter
 	h := server.NewAPIHandler(a)
@@ -70,6 +74,6 @@ func main() {
 		"port":    conf.Port,
 	}).Info("server starting")
 
-	log.WithField("error", s.Start(conf.Addr, conf.Port)).
+	log.WithError(s.Start(conf.Addr, conf.Port)).
 		Fatal("server error")
 }

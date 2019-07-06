@@ -16,8 +16,8 @@ type UserRepository struct {
 // Add implements UserRepository.Add.
 func (r *UserRepository) Add(user epitome.User) error {
 	_, err := squirrel.Insert("users").
-		Columns("username", "password", "salt").
-		Values(user.Username, user.Password, user.Salt).
+		Columns("username").
+		Values(user.Username).
 		RunWith(r.db).
 		Exec()
 	return err

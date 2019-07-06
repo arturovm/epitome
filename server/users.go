@@ -23,7 +23,7 @@ func (h *APIHandler) postUser(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	}
 
-	err = h.api.Users().SignUp(user.Username, user.Password)
+	_, err = h.api.Users().SignUp(user.Username, user.Password)
 	if err != nil {
 		log.WithField("error", err).Error("error creating user")
 		w.WriteHeader(http.StatusInternalServerError)
