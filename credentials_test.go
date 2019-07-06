@@ -23,12 +23,3 @@ func TestMatchPassword(t *testing.T) {
 	match := creds.MatchPassword(password)
 	require.True(t, match)
 }
-
-func TestNewUserCredentials(t *testing.T) {
-	username, password := "testuser", "test password"
-	creds, _ := epitome.GenerateCredentials(password)
-	user := epitome.NewUser(username, creds)
-
-	require.NotNil(t, user.Credentials())
-	require.Equal(t, user.Credentials(), creds)
-}

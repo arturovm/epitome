@@ -8,14 +8,16 @@ import (
 	"github.com/arturovm/epitome"
 )
 
-func TestNewUser(t *testing.T) {
-	name := "testuser"
-	u := epitome.NewUser(name, nil)
-	require.Equal(t, u.Username, name)
+func TestCreateUser(t *testing.T) {
+	username, password := "testuser", "testpassword"
+	u, err := epitome.CreateUser(username, password)
+	require.NoError(t, err)
+	require.NotNil(t, u)
+	require.NotNil(t, u.Credentials())
 }
 
-func TestNewUserMixedCase(t *testing.T) {
-	name := "TestUser"
-	u := epitome.NewUser(name, nil)
+func TestCreateUserMixedCase(t *testing.T) {
+	username, password := "TestUser", "testpassword"
+	u, _ := epitome.CreateUser(username, password)
 	require.Equal(t, u.Username, "testuser")
 }

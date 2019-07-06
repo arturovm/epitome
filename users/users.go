@@ -26,18 +26,16 @@ func New(users storage.UserRepository) (*Users, error) {
 
 // SignUp attempts to create a new user with the given username and password.
 func (u *Users) SignUp(username, password string) (*epitome.User, error) {
-	creds, err := epitome.GenerateCredentials(password)
+	user, err := epitome.CreateUser(username, password)
 	if err != nil {
-		return nil, errors.Wrap(err, "error generating credentials")
+		return nil, errors.Wrap(err, "error creating user")
 	}
 
-	user := epitome.NewUser(username, creds)
-
-	err = u.users.Add(user)
+	err = u.users.Add(*user)
 	if err != nil {
 		return nil, errors.Wrap(err, "error saving user")
 	}
-	return &user, nil
+	return user, nil
 }
 
 // UserInfo retrieves a user instance from the database with the given username.

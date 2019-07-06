@@ -10,8 +10,17 @@ type User struct {
 	credentials *Credentials
 }
 
-// NewUser initializes a new user with the given parameters.
-func NewUser(username string, credentials *Credentials) User {
+func CreateUser(username, password string) (*User, error) {
+	creds, err := GenerateCredentials(password)
+	if err != nil {
+		return nil, err
+	}
+
+	u := newUser(username, creds)
+	return &u, nil
+}
+
+func newUser(username string, credentials *Credentials) User {
 	return User{
 		Username:    strings.ToLower(username),
 		credentials: credentials,

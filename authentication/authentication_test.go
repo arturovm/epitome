@@ -62,10 +62,9 @@ func TestLogIn(t *testing.T) {
 		password = "testpassword"
 	)
 
-	creds, _ := epitome.GenerateCredentials(password)
-	u := epitome.NewUser(username, creds)
+	u, _ := epitome.CreateUser(username, password)
 
-	users.On("ByUsername", u.Username).Return(&u, nil)
+	users.On("ByUsername", u.Username).Return(u, nil)
 	sessions.On("Add", mock.AnythingOfType("epitome.Session")).
 		Return(nil)
 
@@ -87,10 +86,9 @@ func TestLogInInvalidPassword(t *testing.T) {
 		password = "testpassword"
 	)
 
-	creds, _ := epitome.GenerateCredentials(password)
-	u := epitome.NewUser(username, creds)
+	u, _ := epitome.CreateUser(username, password)
 
-	users.On("ByUsername", u.Username).Return(&u, nil)
+	users.On("ByUsername", u.Username).Return(u, nil)
 
 	auth, _ := authentication.New(&sessions, &users)
 
