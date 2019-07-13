@@ -17,11 +17,8 @@ type Users struct {
 var ErrInvalidPassword = errors.New("password is invalid")
 
 // New takes a user repository and returns an initialized users service.
-func New(users storage.UserRepository) (*Users, error) {
-	if users == nil {
-		return nil, errors.New("invalid repository")
-	}
-	return &Users{users: users}, nil
+func New(users storage.UserRepository) *Users {
+	return &Users{users: users}
 }
 
 // SignUp attempts to create a new user with the given username and password.
