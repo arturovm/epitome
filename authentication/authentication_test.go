@@ -12,19 +12,12 @@ import (
 	mockstorage "github.com/arturovm/epitome/storage/mock"
 )
 
-func TestNewAuthenticationServiceNoRepo(t *testing.T) {
-	auth, err := authentication.New(nil, nil)
-	require.Error(t, err)
-	require.Nil(t, auth)
-}
-
 func TestNewAuthenticationService(t *testing.T) {
 	var (
 		users    mockstorage.UserRepository
 		sessions mockstorage.SessionRepository
 	)
-	auth, err := authentication.New(&sessions, &users)
-	require.NoError(t, err)
+	auth := authentication.New(&sessions, &users)
 	require.NotNil(t, auth)
 	users.AssertExpectations(t)
 	sessions.AssertExpectations(t)
@@ -43,7 +36,7 @@ func TestLogInNoUser(t *testing.T) {
 	users.On("ByUsername", username).
 		Return(emptyUser, storage.ErrUserNotFound)
 
-	auth, _ := authentication.New(&sessions, &users)
+	auth := authentication.New(&sessions, &users)
 
 	sess, err := auth.LogIn(username, password)
 	require.EqualError(t, err,
@@ -68,7 +61,7 @@ func TestLogIn(t *testing.T) {
 	sessions.On("Add", mock.AnythingOfType("epitome.Session")).
 		Return(nil)
 
-	auth, _ := authentication.New(&sessions, &users)
+	auth := authentication.New(&sessions, &users)
 
 	sess, err := auth.LogIn(username, password)
 	require.NoError(t, err)
@@ -90,7 +83,7 @@ func TestLogInInvalidPassword(t *testing.T) {
 
 	users.On("ByUsername", u.Username).Return(u, nil)
 
-	auth, _ := authentication.New(&sessions, &users)
+	auth := authentication.New(&sessions, &users)
 
 	sess, err := auth.LogIn(username, "wrong password")
 	require.EqualError(t, err,

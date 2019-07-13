@@ -37,8 +37,3 @@ func (u *Users) SignUp(username, password string) (*epitome.User, error) {
 	}
 	return user, nil
 }
-
-// UserInfo retrieves a user instance from the database with the given username.
-func (u *Users) UserInfo(username string) (*epitome.User, error) {
-	return u.users.ByUsername(username)
-}

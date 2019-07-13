@@ -19,14 +19,11 @@ type Authentication struct {
 
 // New takes a sessions repository and a users repository and returns an
 // initialized authentication service.
-func New(sessions storage.SessionRepository, users storage.UserRepository) (*Authentication, error) {
-	if sessions == nil || users == nil {
-		return nil, errors.New("invalid repository")
-	}
+func New(sessions storage.SessionRepository, users storage.UserRepository) *Authentication {
 	return &Authentication{
 		sessions: sessions,
 		users:    users,
-	}, nil
+	}
 }
 
 // LogIn creates a new session if the given username and password match those
