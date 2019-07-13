@@ -3,6 +3,7 @@ module github.com/arturovm/epitome
 go 1.12
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.3.3
 	github.com/Masterminds/squirrel v1.1.0
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
 	github.com/google/uuid v1.1.1

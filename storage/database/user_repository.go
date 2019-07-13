@@ -1,11 +1,14 @@
 package database
 
 import (
+	"database/sql"
+
 	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 
 	"github.com/arturovm/epitome"
+	"github.com/arturovm/epitome/storage"
 )
 
 // UserRepository implements storage.UserRepository.
@@ -13,11 +16,20 @@ type UserRepository struct {
 	db *sqlx.DB
 }
 
+func NewUserRepository(db *sql.DB) storage.UserRepository {
+	dbx := sqlx.NewDb(db, "sqlite")
+	return &UserRepository{
+		db: dbx,
+	}
+}
+
 // Add implements UserRepository.Add.
 func (r *UserRepository) Add(user epitome.User) error {
 	_, err := squirrel.Insert("users").
-		Columns("username").
-		Values(user.Username).
+		Columns("username", "password", "salt").
+		Values(user.Username,
+			user.Credentials().Password,
+			user.Credentials().Salt).
 		RunWith(r.db).
 		Exec()
 	return err
