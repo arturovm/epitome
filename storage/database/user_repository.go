@@ -37,7 +37,7 @@ func (r *UserRepository) Add(user epitome.User) error {
 
 // ByUsername implements UserRepository.ByUsername.
 func (r *UserRepository) ByUsername(username string) (*epitome.User, error) {
-	query, args, err := squirrel.Select("username", "password", "salt").
+	query, args, err := squirrel.Select("password", "salt").
 		From("users").
 		Where(squirrel.Eq{"username": username}).
 		ToSql()
@@ -45,11 +45,12 @@ func (r *UserRepository) ByUsername(username string) (*epitome.User, error) {
 		return nil, errors.Wrap(err, "error building select query")
 	}
 
-	var user epitome.User
-	err = r.db.Get(&user, query, args...)
+	var credentials epitome.Credentials
+	err = r.db.Get(&credentials, query, args...)
 	if err != nil {
 		return nil, errors.Wrap(err, "error querying database")
 	}
 
+	user := epitome.NewUser(username, &credentials)
 	return &user, nil
 }

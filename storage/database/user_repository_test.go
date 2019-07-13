@@ -16,7 +16,7 @@ func TestAddUser(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
 
-	mock.ExpectExec("INSERT INTO users").
+	mock.ExpectExec(`INSERT INTO users`).
 		WithArgs(user.Username,
 			user.Credentials().Password,
 			user.Credentials().Salt).
@@ -25,4 +25,29 @@ func TestAddUser(t *testing.T) {
 	repo := database.NewUserRepository(db)
 	err = repo.Add(*user)
 	require.NoError(t, err)
+}
+
+func TestGetUser(t *testing.T) {
+	user, _ := epitome.CreateUser("testusername", "testpassword")
+
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	credentialsRow := sqlmock.NewRows([]string{"password", "salt"}).
+		AddRow(user.Credentials().Password, user.Credentials().Salt)
+	mock.ExpectQuery(`SELECT password, salt FROM users`).
+		WithArgs(user.Username).
+		WillReturnRows(credentialsRow)
+
+	repo := database.NewUserRepository(db)
+	resp, err := repo.ByUsername(user.Username)
+	require.NoError(t, err)
+	require.Equal(t, user.Username, resp.Username)
+	require.Equal(t,
+		user.Credentials().Password,
+		resp.Credentials().Password)
+	require.Equal(t,
+		user.Credentials().Salt,
+		resp.Credentials().Salt)
+
 }

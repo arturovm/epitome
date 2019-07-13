@@ -16,11 +16,11 @@ func CreateUser(username, password string) (*User, error) {
 		return nil, err
 	}
 
-	u := newUser(username, creds)
+	u := NewUser(username, creds)
 	return &u, nil
 }
 
-func newUser(username string, credentials *Credentials) User {
+func NewUser(username string, credentials *Credentials) User {
 	return User{
 		Username:    strings.ToLower(username),
 		credentials: credentials,
