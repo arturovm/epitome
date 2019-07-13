@@ -7,6 +7,10 @@ import (
 	"github.com/arturovm/epitome/storage"
 )
 
+type Service interface {
+	SignUp(username, password string) (*epitome.User, error)
+}
+
 // Users is a user managing service.
 type Users struct {
 	users storage.UserRepository
@@ -17,7 +21,7 @@ type Users struct {
 var ErrInvalidPassword = errors.New("password is invalid")
 
 // New takes a user repository and returns an initialized users service.
-func New(users storage.UserRepository) *Users {
+func New(users storage.UserRepository) Service {
 	return &Users{users: users}
 }
 
@@ -29,6 +33,9 @@ func (u *Users) SignUp(username, password string) (*epitome.User, error) {
 	}
 
 	err = u.users.Add(*user)
+	if err == storage.ErrUserExists {
+		return nil, err
+	}
 	if err != nil {
 		return nil, errors.Wrap(err, "error saving user")
 	}

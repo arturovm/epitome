@@ -53,6 +53,8 @@ func TestGetUser(t *testing.T) {
 	require.Equal(t,
 		user.Credentials().Salt,
 		resp.Credentials().Salt)
+	err = mock.ExpectationsWereMet()
+	require.NoError(t, err)
 
 }
 
@@ -70,4 +72,6 @@ func TestGetNonExistentUser(t *testing.T) {
 	u, err := repo.ByUsername(badUsername)
 	require.EqualError(t, err, storage.ErrUserNotFound.Error())
 	require.Nil(t, u)
+	err = mock.ExpectationsWereMet()
+	require.NoError(t, err)
 }
