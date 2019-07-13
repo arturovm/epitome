@@ -1,6 +1,3 @@
-.PHONY: all
-all: app frontend
-
 .PHONY: app
 app: bin/epitome
 	mkdir -p bin/.epitome
