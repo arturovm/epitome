@@ -8,7 +8,7 @@ bin/epitome: $(shell find . -path '**/*.go')
 
 .PHONY: test
 test:
-	go test -v ./...
+	go test ./...
 
 .PHONY: run
 run: bin/epitome

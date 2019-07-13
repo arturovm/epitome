@@ -1,12 +1,14 @@
 package database_test
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 
 	"github.com/arturovm/epitome"
+	"github.com/arturovm/epitome/storage"
 	"github.com/arturovm/epitome/storage/database"
 )
 
@@ -27,6 +29,8 @@ func TestAddUser(t *testing.T) {
 	require.NoError(t, err)
 }
 
+const getUserQuery = `SELECT password, salt FROM users`
+
 func TestGetUser(t *testing.T) {
 	user, _ := epitome.CreateUser("testusername", "testpassword")
 
@@ -35,7 +39,7 @@ func TestGetUser(t *testing.T) {
 
 	credentialsRow := sqlmock.NewRows([]string{"password", "salt"}).
 		AddRow(user.Credentials().Password, user.Credentials().Salt)
-	mock.ExpectQuery(`SELECT password, salt FROM users`).
+	mock.ExpectQuery(getUserQuery).
 		WithArgs(user.Username).
 		WillReturnRows(credentialsRow)
 
@@ -50,4 +54,20 @@ func TestGetUser(t *testing.T) {
 		user.Credentials().Salt,
 		resp.Credentials().Salt)
 
+}
+
+func TestGetNonExistentUser(t *testing.T) {
+	badUsername := "userNotExists"
+
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	mock.ExpectQuery(getUserQuery).
+		WithArgs(badUsername).
+		WillReturnError(sql.ErrNoRows)
+
+	repo := database.NewUserRepository(db)
+	u, err := repo.ByUsername(badUsername)
+	require.EqualError(t, err, storage.ErrUserNotFound.Error())
+	require.Nil(t, u)
 }

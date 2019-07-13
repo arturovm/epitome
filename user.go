@@ -10,6 +10,8 @@ type User struct {
 	credentials *Credentials
 }
 
+// CreateUser takes a username and password and returns a new user with valid
+// credentials.
 func CreateUser(username, password string) (*User, error) {
 	creds, err := GenerateCredentials(password)
 	if err != nil {
@@ -20,6 +22,8 @@ func CreateUser(username, password string) (*User, error) {
 	return &u, nil
 }
 
+// NewUser takes a username and credentials and returns a user with credentials
+// set to the specified credentials.
 func NewUser(username string, credentials *Credentials) User {
 	return User{
 		Username:    strings.ToLower(username),

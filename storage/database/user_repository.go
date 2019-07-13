@@ -16,6 +16,8 @@ type UserRepository struct {
 	db *sqlx.DB
 }
 
+// NewUserRepository takes a sql.DB and returns an initialized user repository
+// instance.
 func NewUserRepository(db *sql.DB) storage.UserRepository {
 	dbx := sqlx.NewDb(db, "sqlite")
 	return &UserRepository{
@@ -47,6 +49,9 @@ func (r *UserRepository) ByUsername(username string) (*epitome.User, error) {
 
 	var credentials epitome.Credentials
 	err = r.db.Get(&credentials, query, args...)
+	if err == sql.ErrNoRows {
+		return nil, storage.ErrUserNotFound
+	}
 	if err != nil {
 		return nil, errors.Wrap(err, "error querying database")
 	}
