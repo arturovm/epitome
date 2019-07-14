@@ -5,6 +5,7 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
+	"github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 
 	"github.com/arturovm/epitome"
@@ -34,6 +35,10 @@ func (r *UserRepository) Add(user epitome.User) error {
 			user.Credentials().Salt).
 		RunWith(r.db).
 		Exec()
+	if sqliteErr, ok := err.(sqlite3.Error); ok &&
+		sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+		return storage.ErrUserExists
+	}
 	return err
 }
 

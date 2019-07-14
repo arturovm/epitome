@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/require"
 
 	"github.com/arturovm/epitome"
@@ -27,6 +28,25 @@ func TestAddUser(t *testing.T) {
 	repo := database.NewUserRepository(db)
 	err = repo.Add(*user)
 	require.NoError(t, err)
+}
+
+func TestAddExistingUser(t *testing.T) {
+	user := epitome.NewUser("conflict", new(epitome.Credentials))
+
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	mock.ExpectExec(`INSERT INTO users`).
+		WithArgs(user.Username,
+			user.Credentials().Password,
+			user.Credentials().Salt).
+		WillReturnError(sqlite3.Error{
+			ExtendedCode: sqlite3.ErrConstraintUnique,
+		})
+
+	repo := database.NewUserRepository(db)
+	err = repo.Add(user)
+	require.EqualError(t, err, storage.ErrUserExists.Error())
 }
 
 const getUserQuery = `SELECT password, salt FROM users`
