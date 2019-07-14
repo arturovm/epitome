@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/arturovm/epitome/storage"
 	"github.com/arturovm/epitome/users"
 )
 
@@ -28,7 +29,15 @@ func (h *UsersHandlerSet) SignUp(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user, _ := h.users.SignUp(reqUser.Username, reqUser.Password)
+	user, err := h.users.SignUp(reqUser.Username, reqUser.Password)
+	if err == storage.ErrUserExists {
+		w.WriteHeader(http.StatusConflict)
+		return
+	}
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusCreated)
 	_ = json.NewEncoder(w).Encode(user)
