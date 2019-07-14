@@ -22,7 +22,12 @@ func NewUsersHandlerSet(users users.Service) *UsersHandlerSet {
 
 func (h *UsersHandlerSet) SignUp(w http.ResponseWriter, req *http.Request) {
 	var reqUser RequestUser
-	_ = json.NewDecoder(req.Body).Decode(&reqUser)
+	err := json.NewDecoder(req.Body).Decode(&reqUser)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	user, _ := h.users.SignUp(reqUser.Username, reqUser.Password)
 
 	w.WriteHeader(http.StatusCreated)

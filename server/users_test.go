@@ -21,6 +21,24 @@ func TestNewUsersHandlerSet(t *testing.T) {
 	usrs.AssertExpectations(t)
 }
 
+func TestEmptyUserSignUp(t *testing.T) {
+	var (
+		usrs = new(mock.Users)
+
+		url = "http://localhost:8080/api/users"
+		w   = httptest.NewRecorder()
+
+		buf = bytes.NewBuffer(nil)
+	)
+	handlerSet := server.NewUsersHandlerSet(usrs)
+
+	req := httptest.NewRequest("POST", url, buf)
+
+	handlerSet.SignUp(w, req)
+	require.Equal(t, w.Code, http.StatusBadRequest)
+	usrs.AssertExpectations(t)
+}
+
 func TestSignUp(t *testing.T) {
 	var (
 		usrs = new(mock.Users)
