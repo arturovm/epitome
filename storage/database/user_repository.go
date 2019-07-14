@@ -20,7 +20,7 @@ type UserRepository struct {
 // NewUserRepository takes a sql.DB and returns an initialized user repository
 // instance.
 func NewUserRepository(db *sql.DB) storage.UserRepository {
-	dbx := sqlx.NewDb(db, "sqlite")
+	dbx := sqlx.NewDb(db, driverName)
 	return &UserRepository{
 		db: dbx,
 	}
