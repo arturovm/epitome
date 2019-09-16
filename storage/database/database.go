@@ -13,11 +13,11 @@ const driverName = "sqlite3"
 
 // Migrate attempts to apply the migrations in the given directory to the
 // database up to the given version.
-func Migrate(db *sql.DB, v int64, dir string) error {
+func Migrate(db *sql.DB, dir string) error {
 	err := goose.SetDialect(driverName)
 	if err != nil {
 		return errors.Wrap(err, "error setting goose dialect")
 	}
 	goose.SetLogger(log.StandardLogger())
-	return goose.UpTo(db, dir, v)
+	return goose.Up(db, dir)
 }

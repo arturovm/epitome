@@ -15,13 +15,6 @@ import (
 	"github.com/arturovm/epitome/users/mock"
 )
 
-func TestNewUsersHandlerSet(t *testing.T) {
-	usrs := new(mock.Users)
-	handlerSet := server.NewUsersHandlerSet(usrs)
-	require.NotNil(t, handlerSet)
-	usrs.AssertExpectations(t)
-}
-
 func TestEmptyUserSignUp(t *testing.T) {
 	var (
 		usrs = new(mock.Users)

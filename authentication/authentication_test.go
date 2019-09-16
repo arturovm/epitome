@@ -12,17 +12,6 @@ import (
 	mockstorage "github.com/arturovm/epitome/storage/mock"
 )
 
-func TestNewAuthenticationService(t *testing.T) {
-	var (
-		users    mockstorage.UserRepository
-		sessions mockstorage.SessionRepository
-	)
-	auth := authentication.New(&sessions, &users)
-	require.NotNil(t, auth)
-	users.AssertExpectations(t)
-	sessions.AssertExpectations(t)
-}
-
 func TestLogInNoUser(t *testing.T) {
 	var (
 		users    mockstorage.UserRepository

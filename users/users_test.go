@@ -11,13 +11,6 @@ import (
 	"github.com/arturovm/epitome/users"
 )
 
-func TestNewUsersService(t *testing.T) {
-	var repo mockstorage.UserRepository
-	us := users.New(&repo)
-	require.NotNil(t, us)
-	repo.AssertExpectations(t)
-}
-
 func TestSignUp(t *testing.T) {
 	var repo mockstorage.UserRepository
 	repo.On("Add", mock.AnythingOfType("epitome.User")).Return(nil)

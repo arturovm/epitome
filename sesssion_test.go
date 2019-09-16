@@ -12,4 +12,5 @@ func TestNewSession(t *testing.T) {
 	sess, err := epitome.NewSession(name)
 	require.NoError(t, err)
 	require.NotNil(t, sess)
+	require.Equal(t, name, sess.Username)
 }
