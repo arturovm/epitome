@@ -35,3 +35,10 @@ func NewUser(username string, credentials *Credentials) User {
 func (u *User) Credentials() *Credentials {
 	return u.credentials
 }
+
+func (u *User) Subscribe(source *Source) Subscription {
+	return Subscription{
+		Username:  u.Username,
+		SourceURL: source.URL,
+	}
+}
