@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 
 	"github.com/arturovm/epitome"
 	"github.com/arturovm/epitome/authentication"
@@ -12,74 +13,68 @@ import (
 	mockstorage "github.com/arturovm/epitome/storage/mock"
 )
 
-func TestLogInNoUser(t *testing.T) {
-	var (
-		users    mockstorage.UserRepository
-		sessions mockstorage.SessionRepository
+type AuthenticationTestSuite struct {
+	suite.Suite
+	users    *mockstorage.UserRepository
+	sessions *mockstorage.SessionRepository
+	auth     *authentication.Authentication
+	username string
+	password string
+}
 
-		username = "notauser"
-		password = "fakepassword"
-	)
+func (s *AuthenticationTestSuite) SetupTest() {
+	s.users = new(mockstorage.UserRepository)
+	s.sessions = new(mockstorage.SessionRepository)
+	s.auth = authentication.New(s.sessions, s.users)
+	s.username = "testuser"
+	s.password = "testpassword"
+}
 
+func (s *AuthenticationTestSuite) TestLogInNoUser() {
 	var emptyUser *epitome.User
-	users.On("ByUsername", username).
+	s.users.On("ByUsername", s.username).
 		Return(emptyUser, storage.ErrUserNotFound)
 
-	auth := authentication.New(&sessions, &users)
+	sess, err := s.auth.LogIn(s.username, s.password)
 
-	sess, err := auth.LogIn(username, password)
-	require.EqualError(t, err,
+	require.EqualError(s.T(), err,
 		authentication.ErrInvalidCredentials.Error())
-	require.Nil(t, sess)
-	users.AssertExpectations(t)
-	sessions.AssertExpectations(t)
+	require.Nil(s.T(), sess)
+	s.users.AssertExpectations(s.T())
+	s.sessions.AssertExpectations(s.T())
 }
 
-func TestLogIn(t *testing.T) {
-	var (
-		users    mockstorage.UserRepository
-		sessions mockstorage.SessionRepository
+func (s *AuthenticationTestSuite) TestLogIn(t *testing.T) {
+	u, _ := epitome.CreateUser(s.username, s.password)
 
-		username = "testuser"
-		password = "testpassword"
-	)
-
-	u, _ := epitome.CreateUser(username, password)
-
-	users.On("ByUsername", u.Username).Return(u, nil)
-	sessions.On("Add", mock.AnythingOfType("epitome.Session")).
+	s.users.On("ByUsername", u.Username).Return(u, nil)
+	s.sessions.On("Add", mock.AnythingOfType("epitome.Session")).
 		Return(nil)
 
-	auth := authentication.New(&sessions, &users)
+	sess, err := s.auth.LogIn(s.username, s.password)
 
-	sess, err := auth.LogIn(username, password)
-	require.NoError(t, err)
-	require.NotNil(t, sess)
-	require.Equal(t, sess.Username, username)
-	users.AssertExpectations(t)
-	sessions.AssertExpectations(t)
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), sess)
+	require.Equal(s.T(), sess.Username, s.username)
+	s.users.AssertExpectations(s.T())
+	s.sessions.AssertExpectations(s.T())
 }
-func TestLogInInvalidPassword(t *testing.T) {
-	var (
-		users    mockstorage.UserRepository
-		sessions mockstorage.SessionRepository
+func (s *AuthenticationTestSuite) TestLogInInvalidPassword(t *testing.T) {
+	u, _ := epitome.CreateUser(s.username, s.password)
 
-		username = "testuser"
-		password = "testpassword"
-	)
+	s.users.On("ByUsername", u.Username).Return(u, nil)
 
-	u, _ := epitome.CreateUser(username, password)
+	sess, err := s.auth.LogIn(s.username, "wrong password")
 
-	users.On("ByUsername", u.Username).Return(u, nil)
-
-	auth := authentication.New(&sessions, &users)
-
-	sess, err := auth.LogIn(username, "wrong password")
-	require.EqualError(t, err,
+	require.EqualError(s.T(), err,
 		authentication.ErrInvalidCredentials.Error())
-	require.Nil(t, sess)
-	users.AssertExpectations(t)
-	sessions.AssertExpectations(t)
+	require.Nil(s.T(), sess)
+	s.users.AssertExpectations(s.T())
+	s.sessions.AssertExpectations(s.T())
+}
+
+func TestAuthentication(t *testing.T) {
+	suite.Run(t, new(AuthenticationTestSuite))
 }
 
 /*
